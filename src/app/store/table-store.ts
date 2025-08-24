@@ -1,12 +1,13 @@
 import { patchState, signalStore, withMethods, withState } from "@ngrx/signals"
 import { addEntities, updateEntity, withEntities } from "@ngrx/signals/entities"
-import { BonusTileType } from "../model/bonus-tile-type"
+import { v4 as uuidv4 } from 'uuid'
+import { BonusTile, BonusTileColor, BonusTileType } from "../model/bonus-tile"
 import { DragonType } from "../model/dragon-type"
-import { FlowerType } from "../model/flower-type"
-import { HonourTileType } from "../model/honour-tile-type"
+import { HonourTile, HonourTileType } from "../model/honour-tile"
 import { Player } from "../model/player"
-import { SuitedTileType } from "../model/suited-tile-type"
+import { SuitedTile, SuitedTileType } from "../model/suited-tile"
 import { Tile } from "../model/tile"
+import { TileType } from "../model/tile-type"
 import { WindType } from "../model/wind-type"
 
 type TableState = {
@@ -17,47 +18,87 @@ type TableState = {
 
 const setupTiles = (): Tile[] => {
     const tiles: Tile[] = [];
-
-    for (const type in SuitedTileType) {
-        for (const number in [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
-            for (const copy in [1, 2, 3, 4]) {
-                tiles.push({
-                    id: copy as unknown as number,
-                    type: type as unknown as SuitedTileType,
-                    number: number as unknown as number
-                })
-            }
-        }
-    }
-
-    for (const type in DragonType) {
-        for (const copy in [1, 2, 3, 4]) {
+    for (let i = 0; i < 4; i++) { // 4 copies of each
+        for (let j = 0; j < 9; j++) {
             tiles.push({
-                id: copy as unknown as number,
-                type: HonourTileType.DRAGON,
-                honour: type as unknown as DragonType
-            })
-        }
-    }
-
-    for (const type in WindType) {
-        for (const copy in [1, 2, 3, 4]) {
+                id: uuidv4(),
+                type: TileType.SUITED,
+                suite: SuitedTileType.BAMBOO,
+                number: j as unknown as number
+            } as SuitedTile)
             tiles.push({
-                id: copy as unknown as number,
-                type: HonourTileType.WIND,
-                honour: type as unknown as WindType
-            })
-        }
-    }
-
-    for (const type in FlowerType) {
-        for (const number in [1, 2, 3, 4]) {
+                id: uuidv4(),
+                type: TileType.SUITED,
+                suite: SuitedTileType.CHARACTER,
+                number: j as unknown as number
+            } as SuitedTile)
             tiles.push({
-                number: number as unknown as number,
-                type: BonusTileType.FLOWER,
-                bonus: type as unknown as FlowerType
-            })
+                id: uuidv4(),
+                type: TileType.SUITED,
+                suite: SuitedTileType.DOTS,
+                number: j as unknown as number
+            } as SuitedTile)
         }
+
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.HONOUR,
+            honour: HonourTileType.DRAGON,
+            value: DragonType.GREEN
+        } as HonourTile)
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.HONOUR,
+            honour: HonourTileType.DRAGON,
+            value: DragonType.RED
+        } as HonourTile)
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.HONOUR,
+            honour: HonourTileType.DRAGON,
+            value: DragonType.WHITE
+        } as HonourTile)
+
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.HONOUR,
+            honour: HonourTileType.WIND,
+            value: WindType.EAST
+        } as HonourTile)
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.HONOUR,
+            honour: HonourTileType.WIND,
+            value: WindType.SOUTH
+        } as HonourTile)
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.HONOUR,
+            honour: HonourTileType.WIND,
+            value: WindType.WEST
+        } as HonourTile)
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.HONOUR,
+            honour: HonourTileType.WIND,
+            value: WindType.NORTH
+        } as HonourTile)
+
+        //Flowers and Seasons
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.BONUS,
+            bonus: BonusTileType.FLOWER,
+            number: i as unknown as number,
+            color: BonusTileColor.BLACK
+        } as BonusTile)
+        tiles.push({
+            id: uuidv4(),
+            type: TileType.BONUS,
+            bonus: BonusTileType.SEASON,
+            number: i as unknown as number,
+            color: BonusTileColor.RED
+        } as BonusTile)
     }
 
     return tiles;
@@ -70,6 +111,7 @@ const initialState: TableState = {
 }
 
 export const TableStore = signalStore(
+    { providedIn: 'root' },
     withState(initialState),
     withEntities<Player>(),
     withMethods((store) => ({
@@ -103,6 +145,17 @@ export const TableStore = signalStore(
                 bonusTiles: [],
             }
             ] as Player[]))
+        },
+        pickupTile() {
+            const unknowns = store.unknown();
+            const indexToRemove = Math.floor(Math.random() * (unknowns.length - 1));
+            const tile = unknowns[indexToRemove];
+
+            const currentPlayerTiles = store.entities()[0].tiles;
+            currentPlayerTiles.push(tile);
+
+            patchState(store, updateEntity({ id: 0, changes: { tiles: [...currentPlayerTiles] } }))
+            patchState(store, (state) => ({ unknown: [...state.unknown.slice(0, indexToRemove), ...state.unknown.slice(indexToRemove + 1)] }))
         },
         updateWind(wind: WindType) {
             switch (wind) {

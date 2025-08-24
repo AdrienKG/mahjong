@@ -1,0 +1,52 @@
+:host {
+    --table-size: 50rem;
+
+    height: var(--table-size);
+    width: var(--table-size);
+    border: 0.25rem solid green;
+    
+    display: grid;
+    grid-template-areas:  
+        '.     across  .     odds'
+        'right discard left  odds'
+        '.     player  .     odds'
+        'extra extra   extra odds';
+    grid-template-columns: 5rem 1fr 5rem auto;
+    grid-template-rows: 5rem 1fr 5rem auto;
+}
+
+.across {
+    border: 0.25rem solid red;
+
+    grid-area: across;
+}
+
+.discard {
+    grid-area: discard;
+}
+
+.extra {
+    grid-area: extra;
+}
+
+.left {
+    border: 0.25rem solid yellow;
+
+    grid-area: left;
+}
+
+.odds {
+    grid-area: odds;
+}
+
+.player {
+    border: 0.25rem solid blue;
+
+    grid-area: player;
+}
+
+.right {
+    border: 0.25rem solid purple;
+
+    grid-area: right;
+}
