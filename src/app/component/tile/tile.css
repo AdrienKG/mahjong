@@ -1,0 +1,8 @@
+:host {
+  border: 0.0625rem black solid;
+  border-radius: 0.125rem;
+  width: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

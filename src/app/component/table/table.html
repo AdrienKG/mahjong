@@ -7,3 +7,11 @@
     <button (click)="onAddPlayers()">add players</button>
 <button (click)="onPickup()">pickup</button>
 </div>
+<div class="odds">
+    <h1>Hands:</h1>
+    <h1>Additional points:</h1>
+    <span>
+        <h3>Eyes: Pair of only 2, 5, 8:</h3>
+        <span>{{ tableStore.pairOfEyesOdds() | probability }}</span>
+    </span>
+</div>

@@ -1,4 +1,4 @@
-import { patchState, signalStore, withMethods, withState } from "@ngrx/signals"
+import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals"
 import { addEntities, updateEntity, withEntities } from "@ngrx/signals/entities"
 import { v4 as uuidv4 } from 'uuid'
 import { BonusTile, BonusTileColor, BonusTileType } from "../model/bonus-tile"
@@ -18,8 +18,8 @@ type TableState = {
 
 const setupTiles = (): Tile[] => {
     const tiles: Tile[] = [];
-    for (let i = 0; i < 4; i++) { // 4 copies of each
-        for (let j = 0; j < 9; j++) {
+    for (let i = 1; i <= 4; i++) { // 4 copies of each
+        for (let j = 1; j <= 9; j++) {
             tiles.push({
                 id: uuidv4(),
                 type: TileType.SUITED,
@@ -186,4 +186,33 @@ export const TableStore = signalStore(
             }
         }
     })),
-);
+    withComputed((store) => ({
+        pairOfEyesOdds() {
+            const currentPlayer = store.entities()[0];
+            const discardedTiles = store.discard();
+            const unknownTiles = store.unknown();
+
+            const suitedCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.SUITED) as SuitedTile[];
+            const suitedDiscardedTiles = discardedTiles.filter(t => t.type === TileType.SUITED) as SuitedTile[];
+            const suites = [SuitedTileType.BAMBOO, SuitedTileType.CHARACTER, SuitedTileType.DOTS];
+            const numbers = [2, 5, 8];
+
+            const probabilities = suites.flatMap(suite =>
+                numbers.map(number => {
+                    const cpCount = suitedCPTiles.filter(t => t.suite === suite && t.number === number).length;
+                    const discardedCount = suitedDiscardedTiles.filter(t => t.suite === suite && t.number === number).length;
+
+                    if (cpCount < 2) {
+                        return (4 - cpCount - discardedCount) / unknownTiles.length;
+                    } else if (cpCount === 2) {
+                        return 1; // Already have a pair
+                    } else {
+                        return 0; // Pung or Kong already
+                    };
+                }
+                ));
+
+            const probNoMatch = probabilities.reduce((acc, p) => acc * (1 - p), 1);
+            return 1 - probNoMatch;
+        }
+    })));
