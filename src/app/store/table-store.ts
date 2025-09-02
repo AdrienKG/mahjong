@@ -197,6 +197,10 @@ export const TableStore = signalStore(
             const suites = [SuitedTileType.BAMBOO, SuitedTileType.CHARACTER, SuitedTileType.DOTS];
             const numbers = [2, 5, 8];
 
+            if (suitedCPTiles.filter(t => t.number === 2 || t.number === 5 || t.number === 8).length === 0) { // No 2, 5 or 8 in hand
+                return (36 - suitedDiscardedTiles.filter(t => t.number === 2 || t.number === 5 || t.number === 8).length) / unknownTiles.length;
+            }
+
             const probabilities = suites.flatMap(suite =>
                 numbers.map(number => {
                     const cpCount = suitedCPTiles.filter(t => t.suite === suite && t.number === number).length;
@@ -223,6 +227,10 @@ export const TableStore = signalStore(
             const honourCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
             const honourDiscardedTiles = discardedTiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
             const dragons = [DragonType.RED, DragonType.GREEN, DragonType.WHITE];
+
+            if (honourCPTiles.filter(t => t.honour === HonourTileType.DRAGON).length === 0) { // No dragons in hand
+                return (12 - honourDiscardedTiles.filter(t => t.honour === HonourTileType.DRAGON).length) / unknownTiles.length;
+            }
 
             const probabilities = dragons.map(dragon => {
                 const cpCount = honourCPTiles.filter(t => t.value === dragon).length;
