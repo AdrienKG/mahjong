@@ -214,5 +214,31 @@ export const TableStore = signalStore(
 
             const probNoMatch = probabilities.reduce((acc, p) => acc * (1 - p), 1);
             return 1 - probNoMatch;
+        },
+        pungOfDragonOdds() {
+            const currentPlayer = store.entities()[0];
+            const discardedTiles = store.discard();
+            const unknownTiles = store.unknown();
+
+            const honourCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
+            const honourDiscardedTiles = discardedTiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
+            const dragons = [DragonType.RED, DragonType.GREEN, DragonType.WHITE];
+
+            const probabilities = dragons.map(dragon => {
+                const cpCount = honourCPTiles.filter(t => t.value === dragon).length;
+                const discardedCount = honourDiscardedTiles.filter(t => t.value === dragon).length;
+
+                if (cpCount < 3) {
+                    return (4 - cpCount - discardedCount) / unknownTiles.length;
+                } else if (cpCount === 3) {
+                    return 1; // Already have a pung
+                } else {
+                    return 0; // Kong already
+                };
+            }
+            );
+
+            const probNoMatch = probabilities.reduce((acc, p) => acc * (1 - p), 1);
+            return 1 - probNoMatch;
         }
     })));
