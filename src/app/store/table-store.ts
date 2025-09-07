@@ -13,7 +13,9 @@ import { WindType } from "../model/wind-type"
 type TableState = {
     wind: WindType,
     discard: Tile[],
-    unknown: Tile[], //wall and other player hidden hands
+    wall: Tile[], //wall and other player hidden hands
+    drawnFromWall: boolean,
+    drawnFromDeadWall: boolean,
 }
 
 const setupTiles = (): Tile[] => {
@@ -107,7 +109,9 @@ const setupTiles = (): Tile[] => {
 const initialState: TableState = {
     wind: WindType.EAST,
     discard: [],
-    unknown: setupTiles(),
+    wall: setupTiles(),
+    drawnFromWall: false,
+    drawnFromDeadWall: false,
 }
 
 export const TableStore = signalStore(
@@ -147,15 +151,15 @@ export const TableStore = signalStore(
             ] as Player[]))
         },
         pickupTile() {
-            const unknowns = store.unknown();
-            const indexToRemove = Math.floor(Math.random() * (unknowns.length - 1));
-            const tile = unknowns[indexToRemove];
+            const wall = store.wall();
+            const indexToRemove = Math.floor(Math.random() * (wall.length - 1));
+            const tile = wall[indexToRemove];
 
             const currentPlayerTiles = store.entities()[0].tiles;
             currentPlayerTiles.push(tile);
 
             patchState(store, updateEntity({ id: 0, changes: { tiles: [...currentPlayerTiles] } }))
-            patchState(store, (state) => ({ unknown: [...state.unknown.slice(0, indexToRemove), ...state.unknown.slice(indexToRemove + 1)] }))
+            patchState(store, (state) => ({ wall: [...state.wall.slice(0, indexToRemove), ...state.wall.slice(indexToRemove + 1)] }))
         },
         updateWind(wind: WindType) {
             switch (wind) {
@@ -186,67 +190,103 @@ export const TableStore = signalStore(
             }
         }
     })),
+    // Hands
     withComputed((store) => ({
-        pairOfEyesOdds() {
+        allChiHand() { return 0; },
+        mixed2SuitHand() { return 0; },
+        allPungHand() { return 0; },
+        mixedHand() { return 0; },
+        little7PairsHand() { return 0; },
+        big7PairsHand() { return 0; },
+        purityHand() { return 0; },
+    })),
+    // Additional points
+    withComputed((store) => ({
+        pairOfSpecialEyesOdds() {
             const currentPlayer = store.entities()[0];
-            const discardedTiles = store.discard();
-            const unknownTiles = store.unknown();
-
             const suitedCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.SUITED) as SuitedTile[];
-            const suitedDiscardedTiles = discardedTiles.filter(t => t.type === TileType.SUITED) as SuitedTile[];
             const suites = [SuitedTileType.BAMBOO, SuitedTileType.CHARACTER, SuitedTileType.DOTS];
             const numbers = [2, 5, 8];
 
-            if (suitedCPTiles.filter(t => t.number === 2 || t.number === 5 || t.number === 8).length === 0) { // No 2, 5 or 8 in hand
-                return (36 - suitedDiscardedTiles.filter(t => t.number === 2 || t.number === 5 || t.number === 8).length) / unknownTiles.length;
+            const counts = suites.flatMap(suite =>
+                numbers.map(number =>
+                    suitedCPTiles.filter(t => t.suite === suite && t.number === number).length
+                )
+            );
+
+            if (counts.some(count => count === 2)) {
+                return 1; // Already have a pair
+            } else if (counts.some(count => count === 1)) {
+                return 0.5; // Halfway there
+            } else {
+                return 0;
             }
-
-            const probabilities = suites.flatMap(suite =>
-                numbers.map(number => {
-                    const cpCount = suitedCPTiles.filter(t => t.suite === suite && t.number === number).length;
-                    const discardedCount = suitedDiscardedTiles.filter(t => t.suite === suite && t.number === number).length;
-
-                    if (cpCount < 2) {
-                        return (4 - cpCount - discardedCount) / unknownTiles.length;
-                    } else if (cpCount === 2) {
-                        return 1; // Already have a pair
-                    } else {
-                        return 0; // Pung or Kong already
-                    };
-                }
-                ));
-
-            const probNoMatch = probabilities.reduce((acc, p) => acc * (1 - p), 1);
-            return 1 - probNoMatch;
         },
         pungOfDragonOdds() {
             const currentPlayer = store.entities()[0];
-            const discardedTiles = store.discard();
-            const unknownTiles = store.unknown();
 
             const honourCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
-            const honourDiscardedTiles = discardedTiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
             const dragons = [DragonType.RED, DragonType.GREEN, DragonType.WHITE];
 
-            if (honourCPTiles.filter(t => t.honour === HonourTileType.DRAGON).length === 0) { // No dragons in hand
-                return (12 - honourDiscardedTiles.filter(t => t.honour === HonourTileType.DRAGON).length) / unknownTiles.length;
-            }
-
-            const probabilities = dragons.map(dragon => {
-                const cpCount = honourCPTiles.filter(t => t.value === dragon).length;
-                const discardedCount = honourDiscardedTiles.filter(t => t.value === dragon).length;
-
-                if (cpCount < 3) {
-                    return (4 - cpCount - discardedCount) / unknownTiles.length;
-                } else if (cpCount === 3) {
-                    return 1; // Already have a pung
-                } else {
-                    return 0; // Kong already
-                };
-            }
+            const counts = dragons.map(dragon =>
+                honourCPTiles.filter(t => t.honour === HonourTileType.DRAGON && t.value === dragon).length
             );
 
-            const probNoMatch = probabilities.reduce((acc, p) => acc * (1 - p), 1);
-            return 1 - probNoMatch;
-        }
+            if (counts.some(count => count === 3)) {
+                return 1; // Already have a pung
+            } else if (counts.some(count => count === 2)) {
+                return 0.67; // 2 out of 3
+            } else if (counts.some(count => count === 1)) {
+                return 0.33; // 1 out of 3
+            }
+            else {
+                return 0;
+            }
+        },
+        pungOfTableOrOwnWindOdds() {
+            const currentPlayer = store.entities()[0];
+
+            const honourCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
+            const tableWindCount = honourCPTiles.filter(t => t.honour === HonourTileType.WIND && t.value === store.wind()).length
+            const ownWindCount = honourCPTiles.filter(t => t.honour === HonourTileType.WIND && t.value === currentPlayer.wind).length
+
+            if (tableWindCount === 3 || ownWindCount === 3) {
+                return 1; // Already have a pung
+            } else if (tableWindCount === 2 || ownWindCount === 2) {
+                return 0.67; // 2 out of 3
+            } else if (tableWindCount === 1 || ownWindCount === 1) {
+                return 0.33; // 1 out of 3
+            }
+            else {
+                return 0;
+            }
+        },
+        drawn15FromEnd() {
+            return store.wall().length === 14;
+        },
+        simpleNumbersOdds() {
+            const currentPlayer = store.entities()[0];
+            const suitedCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.SUITED) as SuitedTile[];
+            const count = suitedCPTiles.filter(t => t.number >= 2 && t.number <= 8).length;
+            return count / 14;
+        },
+        noWindsOrDragonsOdds() {
+            const currentPlayer = store.entities()[0];
+            const honourCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.HONOUR) as HonourTile[];
+            const handOdds = [store.allPungHand(), store.mixedHand(), store.little7PairsHand()];
+            const maxOdds = handOdds.sort((a, b) => b - a)[0];
+            if (honourCPTiles.length > 0) {
+                return 0;
+            }
+            return maxOdds;
+        },
+        terminalPungsKongsOdds() {
+            if (store.allPungHand() === 0) { return 0; }
+            else {
+                const currentPlayer = store.entities()[0];
+                const suitedCPTiles = currentPlayer.tiles.filter(t => t.type === TileType.SUITED) as SuitedTile[];
+                const count = suitedCPTiles.filter(t => t.number === 1 || t.number === 9).length;
+                return Math.min(count, 12) / 12;
+            }
+        },
     })));
