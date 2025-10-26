@@ -1,0 +1,22 @@
+{
+  "name": "Node.js",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bullseye",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/angular-cli:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "angular.ng-template"
+      ]
+    }
+  },
+  "forwardPorts": [4200],
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached",
+    "source=${localEnv:SSH_AUTH_SOCK},target=/tmp/ssh-agent.sock,type=bind"
+  ],
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "/tmp/ssh-agent.sock"
+  }
+}
