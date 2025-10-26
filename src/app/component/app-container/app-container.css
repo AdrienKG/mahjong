@@ -1,0 +1,30 @@
+:host {
+    height: 100%;
+    width: 100%;
+}
+
+app-odds-panel {
+    background-color: greenyellow;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    overflow-y: auto;
+}
+
+@media screen and (min-width: 600px) {
+    :host {
+        display: grid;
+
+        grid-template-areas:  
+            'table odds';
+        grid-template-columns: 1fr auto;
+        
+    }
+
+    app-odds-panel {
+        grid-area: odds;
+
+        position: unset;
+    }
+}

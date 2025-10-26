@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { Table } from './component/table/table';
+import { AppContainer } from './component/app-container/app-container';
 
 export const routes: Routes = [
     {
         path: '',
-        component: Table
+        component: AppContainer
     }
 ];

@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { ProbabilityPipe } from '../../pipe/probability-pipe';
 import { TableStore } from '../../store/table-store';
 import { CurrentPlayer } from '../current-player/current-player';
+import { OddsPanel } from "../odds-panel/odds-panel";
 
 @Component({
   selector: 'app-table',
-  imports: [CurrentPlayer, ProbabilityPipe],
+  imports: [CurrentPlayer, OddsPanel],
   templateUrl: './table.html',
   styleUrl: './table.css'
 })

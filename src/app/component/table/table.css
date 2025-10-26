@@ -7,12 +7,12 @@
     
     display: grid;
     grid-template-areas:  
-        '.     across  .     odds'
-        'right discard left  odds'
-        '.     player  .     odds'
-        'extra extra   extra odds';
-    grid-template-columns: 5rem 1fr 5rem auto;
-    grid-template-rows: 5rem 1fr 5rem auto;
+        '.     across  .    '
+        'right discard left '
+        '.     player  .    '
+        'extra extra   extra';
+    grid-template-columns: 5rem 1fr 5rem;
+    grid-template-rows: 5rem 1fr 5rem;
 }
 
 .across {
@@ -36,7 +36,11 @@
 }
 
 .odds {
-    grid-area: odds;
+    background-color: greenyellow;
+    position: absolute;
+    right: 0;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .player {
