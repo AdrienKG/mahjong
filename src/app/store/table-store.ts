@@ -1,10 +1,11 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals"
+import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from "@ngrx/signals"
 import { addEntities, updateEntity, withEntities } from "@ngrx/signals/entities"
 import { v4 as uuidv4 } from 'uuid'
 import { BonusTile, BonusTileColor, BonusTileType } from "../model/bonus-tile"
 import { DragonType } from "../model/dragon-type"
 import { HonourTile, HonourTileType } from "../model/honour-tile"
 import { Player } from "../model/player"
+import { PlayerSeat } from "../model/player-seat"
 import { SuitedTile, SuitedTileType } from "../model/suited-tile"
 import { Tile } from "../model/tile"
 import { TileType } from "../model/tile-type"
@@ -121,30 +122,47 @@ export const TableStore = signalStore(
     withMethods((store) => ({
         addPlayers() {
             patchState(store, addEntities([{
-                id: 0,
+                id: PlayerSeat.current,
                 wind: WindType.EAST,
-                tiles: [],
+                tiles:
+                    Array.from({ length: 14 }).map(() => (
+                        {
+                            id: uuidv4(),
+                            type: TileType.UNKNOWN
+                        } as Tile)),
                 exposedTiles: [],
                 bonusTiles: [],
             },
             {
-                id: 1,
+                id: PlayerSeat.right,
                 wind: WindType.SOUTH,
-                tiles: [],
+                tiles: Array.from({ length: 13 }).map(() => (
+                    {
+                        id: uuidv4(),
+                        type: TileType.UNKNOWN
+                    } as Tile)),
                 exposedTiles: [],
                 bonusTiles: [],
             },
             {
-                id: 2,
+                id: PlayerSeat.across,
                 wind: WindType.WEST,
-                tiles: [],
+                tiles: Array.from({ length: 13 }).map(() => (
+                    {
+                        id: uuidv4(),
+                        type: TileType.UNKNOWN
+                    } as Tile)),
                 exposedTiles: [],
                 bonusTiles: [],
             },
             {
-                id: 3,
+                id: PlayerSeat.left,
                 wind: WindType.NORTH,
-                tiles: [],
+                tiles: Array.from({ length: 13 }).map(() => (
+                    {
+                        id: uuidv4(),
+                        type: TileType.UNKNOWN
+                    } as Tile)),
                 exposedTiles: [],
                 bonusTiles: [],
             }
@@ -289,4 +307,10 @@ export const TableStore = signalStore(
                 return Math.min(count, 12) / 12;
             }
         },
-    })));
+    })),
+    withHooks({
+        onInit(store) {
+            store.addPlayers();
+        }
+    })
+);

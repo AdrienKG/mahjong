@@ -1,8 +1,17 @@
 :host {
+  box-sizing: border-box;
   border: 0.0625rem black solid;
   border-radius: 0.125rem;
   width: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+:host(:hover) {
+  border: 0.125rem blue solid;
+}
+
+:host(.selected) {
+  border: 0.125rem green solid;
 }

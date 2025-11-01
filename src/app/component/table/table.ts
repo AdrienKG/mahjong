@@ -1,15 +1,17 @@
 import { Component, inject } from '@angular/core';
+import { PlayerSeat } from '../../model/player-seat';
 import { TableStore } from '../../store/table-store';
-import { CurrentPlayer } from '../current-player/current-player';
-import { OddsPanel } from "../odds-panel/odds-panel";
+import { Player } from '../player/player';
 
 @Component({
   selector: 'app-table',
-  imports: [CurrentPlayer, OddsPanel],
+  imports: [Player],
   templateUrl: './table.html',
   styleUrl: './table.css'
 })
 export class Table {
+  playerSeat = PlayerSeat;
+
   tableStore = inject(TableStore);
 
   onAddPlayers() {

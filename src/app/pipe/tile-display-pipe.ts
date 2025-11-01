@@ -46,11 +46,11 @@ export class TileDisplayPipe implements PipeTransform {
           case WindType.EAST:
             return 'E';
           case WindType.SOUTH:
-              return 'S';
+            return 'S';
           case WindType.WEST:
-              return 'W';
+            return 'W';
           case WindType.NORTH:
-              return 'N';
+            return 'N';
         }
       }
     }
@@ -66,6 +66,9 @@ export class TileDisplayPipe implements PipeTransform {
           break;
       }
       return `${tile.number}${character}`;
+    }
+    if (value.type === TileType.UNKNOWN) {
+      return '??';
     }
     return '';
   }
