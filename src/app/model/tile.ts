@@ -1,6 +1,6 @@
-import { TileType } from "./tile-type";
+import { TileType } from './tile-type';
 
 export interface Tile {
-    id: string,
-    type: TileType,
+  id: string;
+  type: TileType;
 }

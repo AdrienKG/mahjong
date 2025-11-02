@@ -1,56 +1,56 @@
 :host {
-    --table-size: 50rem;
+  --table-size: 50rem;
 
-    height: var(--table-size);
-    width: var(--table-size);
-    border: 0.25rem solid green;
-    
-    display: grid;
-    grid-template-areas:  
-        '.     across  .    '
-        'right discard left '
-        '.     player  .    '
-        'extra extra   extra';
-    grid-template-columns: 5rem 1fr 5rem;
-    grid-template-rows: 5rem 1fr 5rem;
+  height: var(--table-size);
+  width: var(--table-size);
+  border: 0.25rem solid green;
+
+  display: grid;
+  grid-template-areas:
+    ".     across  .    "
+    "right discard left "
+    ".     player  .    "
+    "extra extra   extra";
+  grid-template-columns: 5rem 1fr 5rem;
+  grid-template-rows: 5rem 1fr 5rem;
 }
 
 .across {
-    border: 0.25rem solid red;
+  border: 0.25rem solid red;
 
-    grid-area: across;
+  grid-area: across;
 }
 
 .discard {
-    grid-area: discard;
+  grid-area: discard;
 }
 
 .extra {
-    grid-area: extra;
+  grid-area: extra;
 }
 
 .left {
-    border: 0.25rem solid yellow;
+  border: 0.25rem solid yellow;
 
-    grid-area: left;
+  grid-area: left;
 }
 
 .odds {
-    background-color: greenyellow;
-    position: absolute;
-    right: 0;
-    height: 100%;
-    overflow-y: auto;
+  background-color: greenyellow;
+  position: absolute;
+  right: 0;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .player {
-    border: 0.25rem solid blue;
+  border: 0.25rem solid blue;
 
-    grid-area: player;
+  grid-area: player;
 }
 
 .right {
-    border: 0.25rem solid purple;
+  border: 0.25rem solid purple;
 
-    grid-area: right;
+  grid-area: right;
 }

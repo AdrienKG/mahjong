@@ -8,7 +8,7 @@ describe('CurrentPlayer', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CurrentPlayer]
+      imports: [CurrentPlayer],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CurrentPlayer);

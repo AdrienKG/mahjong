@@ -6,8 +6,6 @@ import { Table } from '../table/table';
   selector: 'app-app-container',
   imports: [Table, OddsPanel],
   templateUrl: './app-container.html',
-  styleUrl: './app-container.css'
+  styleUrl: './app-container.css',
 })
-export class AppContainer {
-
-}
+export class AppContainer {}

@@ -1,17 +1,17 @@
-import { Tile } from "./tile"
+import { Tile } from './tile';
 
 export interface BonusTile extends Tile {
-  bonus: BonusTileType,
-  color: BonusTileColor
-  number: number
+  bonus: BonusTileType;
+  color: BonusTileColor;
+  number: number;
 }
 
 export enum BonusTileType {
-    FLOWER,
-    SEASON
+  FLOWER,
+  SEASON,
 }
 
 export enum BonusTileColor {
-    BLACK,
-    RED,
+  BLACK,
+  RED,
 }

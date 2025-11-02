@@ -6,9 +6,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "angular.ng-template"
-      ]
+      "extensions": ["angular.ng-template"]
     }
   },
   "forwardPorts": [4200],

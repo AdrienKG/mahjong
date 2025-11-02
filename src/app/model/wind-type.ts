@@ -1,6 +1,6 @@
 export enum WindType {
-    EAST,
-    SOUTH,
-    WEST,
-    NORTH
+  EAST,
+  SOUTH,
+  WEST,
+  NORTH,
 }

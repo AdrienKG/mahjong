@@ -1,5 +1,5 @@
 export enum DragonType {
-    GREEN,
-    RED,
-    WHITE // Soap
+  GREEN,
+  RED,
+  WHITE, // Soap
 }

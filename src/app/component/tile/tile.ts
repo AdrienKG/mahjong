@@ -1,4 +1,10 @@
-import { Component, computed, HostListener, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  HostListener,
+  input,
+  signal,
+} from '@angular/core';
 import { Tile as TileInt } from '../../model/tile';
 import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
 
@@ -8,8 +14,8 @@ import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
   templateUrl: './tile.html',
   styleUrl: './tile.css',
   host: {
-    '[class.selected]': 'isSelected()'
-  }
+    '[class.selected]': 'isSelected()',
+  },
 })
 export class Tile {
   public tile = input.required<TileInt>();
@@ -19,6 +25,6 @@ export class Tile {
 
   @HostListener('click')
   onClick() {
-    this.selected.update(value => !value);
+    this.selected.update((value) => !value);
   }
 }

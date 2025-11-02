@@ -1,6 +1,6 @@
 export enum TileType {
-    BONUS,
-    HONOUR,
-    SUITED,
-    UNKNOWN
+  BONUS,
+  HONOUR,
+  SUITED,
+  UNKNOWN,
 }

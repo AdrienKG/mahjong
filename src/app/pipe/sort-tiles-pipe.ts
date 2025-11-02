@@ -8,10 +8,9 @@ import { TileType } from '../model/tile-type';
 import { WindType } from '../model/wind-type';
 
 @Pipe({
-  name: 'sortTiles'
+  name: 'sortTiles',
 })
 export class SortTilesPipe implements PipeTransform {
-
   transform(value: Tile[]): Tile[] {
     return value.sort((t1, t2) => {
       let t1Value = this.generateValue(t1);
@@ -22,7 +21,7 @@ export class SortTilesPipe implements PipeTransform {
       }
 
       return -1;
-    })
+    });
   }
 
   generateValue(t: Tile): number {
@@ -31,12 +30,12 @@ export class SortTilesPipe implements PipeTransform {
       value += 1000;
       const tile = t as BonusTile;
       if (tile.bonus === BonusTileType.FLOWER) {
-        value += 100
+        value += 100;
         if (tile.color === BonusTileColor.BLACK) {
           value += 10;
         }
         if (tile.color === BonusTileColor.RED) {
-          value += 20
+          value += 20;
         }
       }
       if (tile.bonus === BonusTileType.SEASON) {

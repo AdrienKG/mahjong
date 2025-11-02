@@ -8,14 +8,13 @@ import { TileType } from '../model/tile-type';
 import { WindType } from '../model/wind-type';
 
 @Pipe({
-  name: 'tileDisplay'
+  name: 'tileDisplay',
 })
 export class TileDisplayPipe implements PipeTransform {
-
   transform(value: Tile): string {
     if (value.type === TileType.SUITED) {
       const tile = value as SuitedTile;
-      let character = ''
+      let character = '';
       switch (tile.suite) {
         case SuitedTileType.BAMBOO:
           character = 'B';
@@ -56,7 +55,7 @@ export class TileDisplayPipe implements PipeTransform {
     }
     if (value.type === TileType.BONUS) {
       const tile = value as BonusTile;
-      let character = ''
+      let character = '';
       switch (tile.bonus) {
         case BonusTileType.FLOWER:
           character = 'F';

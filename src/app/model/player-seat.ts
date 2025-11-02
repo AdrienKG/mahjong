@@ -1,6 +1,6 @@
 export enum PlayerSeat {
-    current,
-    right,
-    across,
-    left
+  current,
+  right,
+  across,
+  left,
 }
