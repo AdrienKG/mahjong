@@ -1,1 +1,8 @@
-{{ tile() | tileDisplay }}
+<button matButton class="tile" (click)="onClick()" [matContextMenuTriggerFor]="contextMenu">
+  {{ tile() | tileDisplay }}
+</button>
+<mat-menu #contextMenu>
+  <button mat-menu-item>Discard</button>
+  <button mat-menu-item>Set</button>
+  <button mat-menu-item>Expose</button>
+</mat-menu>

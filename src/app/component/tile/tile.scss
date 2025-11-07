@@ -1,0 +1,23 @@
+@use "@angular/material" as mat;
+
+:host {
+  box-sizing: border-box;
+  position: relative;
+}
+
+.tile {
+  &:hover {
+    border: 0.125rem blue solid;
+  }
+
+  &.selected {
+    border: 0.125rem green solid;
+  }
+
+  @include mat.button-overrides(
+    (
+      text-container-shape: 0.5rem,
+      text-container-height: 5rem,
+    )
+  );
+}

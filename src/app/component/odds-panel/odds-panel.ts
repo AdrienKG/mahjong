@@ -6,7 +6,7 @@ import { TableStore } from '../../store/table-store';
   selector: 'app-odds-panel',
   imports: [ProbabilityPipe],
   templateUrl: './odds-panel.html',
-  styleUrl: './odds-panel.css',
+  styleUrl: './odds-panel.scss',
 })
 export class OddsPanel {
   tableStore = inject(TableStore);

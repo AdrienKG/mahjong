@@ -8,7 +8,10 @@ import { Tile } from '../tile/tile';
   selector: 'app-player',
   imports: [SortTilesPipe, Tile],
   templateUrl: './player.html',
-  styleUrl: './player.css',
+  styleUrl: './player.scss',
+  host: {
+    '[class.vertical]': 'this.playerSeat() === 1 || this.playerSeat() === 3',
+  },
 })
 export class Player {
   tableStore = inject(TableStore);

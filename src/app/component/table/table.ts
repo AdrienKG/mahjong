@@ -7,7 +7,7 @@ import { Player } from '../player/player';
   selector: 'app-table',
   imports: [Player],
   templateUrl: './table.html',
-  styleUrl: './table.css',
+  styleUrl: './table.scss',
 })
 export class Table {
   playerSeat = PlayerSeat;
