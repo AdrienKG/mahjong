@@ -11,45 +11,45 @@ import { WindType } from '../model/wind-type';
   name: 'tileDisplay',
 })
 export class TileDisplayPipe implements PipeTransform {
-  transform(value: Tile): string {
+  transform(value: Tile, long: boolean = false): string {
     if (value.type === TileType.SUITED) {
       const tile = value as SuitedTile;
       let character = '';
       switch (tile.suite) {
         case SuitedTileType.BAMBOO:
-          character = 'B';
+          character = long ? 'Bamboo' : 'B';
           break;
         case SuitedTileType.CHARACTER:
-          character = 'C';
+          character = long ? 'Character' : 'C';
           break;
         case SuitedTileType.DOTS:
-          character = 'D';
+          character = long ? 'Dot' : 'D';
           break;
       }
-      return `${tile.number}${character}`;
+      return long ? `${tile.number} ${character}` : `${tile.number}${character}`;
     }
     if (value.type === TileType.HONOUR) {
       const tile = value as HonourTile;
       if (tile.honour === HonourTileType.DRAGON) {
         switch (tile.value) {
           case DragonType.GREEN:
-            return 'GD';
+            return long ? 'Green Dragon' : 'GD';
           case DragonType.RED:
-            return 'RD';
+            return long ? 'Red Dragon': 'RD';
           case DragonType.WHITE:
-            return 'WD';
+            return long ? 'White Dragon' : 'WD';
         }
       }
       if (tile.honour === HonourTileType.WIND) {
         switch (tile.value) {
           case WindType.EAST:
-            return 'E';
+            return long ? 'East' : 'E';
           case WindType.SOUTH:
-            return 'S';
+            return long ? 'South' : 'S';
           case WindType.WEST:
-            return 'W';
+            return long ? 'West' : 'W';
           case WindType.NORTH:
-            return 'N';
+            return long ? 'North' : 'N';
         }
       }
     }
@@ -58,13 +58,13 @@ export class TileDisplayPipe implements PipeTransform {
       let character = '';
       switch (tile.bonus) {
         case BonusTileType.FLOWER:
-          character = 'F';
+          character = long ? 'Flower' : 'F';
           break;
         case BonusTileType.SEASON:
-          character = 'S';
+          character = long ? 'South' : 'S';
           break;
       }
-      return `${tile.number}${character}`;
+      return long ? `${tile.number} ${character}` : `${tile.number}${character}`;
     }
     if (value.type === TileType.UNKNOWN) {
       return '??';
