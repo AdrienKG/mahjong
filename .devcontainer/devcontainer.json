@@ -9,6 +9,9 @@
       "theme": "cypher"
     }
   },
+  "runArgs": [
+    "--network=host"
+  ],
   "customizations": {
     "vscode": {
       "extensions": ["angular.ng-template"]

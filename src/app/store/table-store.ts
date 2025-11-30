@@ -210,6 +210,22 @@ export const TableStore = signalStore(
         ],
       }));
     },
+    setTile(playerId: PlayerSeat, tileId: string, newTileId: string) {
+      const wall = store.wall();
+      const wallTileIndex = wall.findIndex((t) => t.id === newTileId);
+      const wallTile = wall[wallTileIndex];
+
+      const player = store.entities().find((p) => p.id === playerId);
+      const playerTileIndex = player?.tiles.findIndex((t) => t.id === tileId);
+      const playerTile = player?.tiles[playerTileIndex!];
+
+      player!.tiles[playerTileIndex!] = wallTile;
+
+      patchState(
+        store,
+        updateEntity({ id: playerId, changes: { tiles: [...player!.tiles] } }),
+      );
+    },
     updateWind(wind: WindType) {
       switch (wind) {
         case WindType.EAST:

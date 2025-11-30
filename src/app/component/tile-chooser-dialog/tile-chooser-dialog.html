@@ -2,7 +2,7 @@
 <mat-dialog-content>
 <mat-form-field>
   <mat-label>Choose a tile</mat-label>
-  <mat-select>
+  <mat-select [(ngModel)]="selectedTileId">
     @for (tile of store.wall(); track tile.id) {
       <mat-option [value]="tile.id">{{ tile | tileDisplay: true }}</mat-option>
     }
@@ -11,5 +11,5 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button matButton mat-dialog-close>Cancel</button>
-  <button matButton [mat-dialog-close]="" cdkFocusInitial>Set</button>
+  <button matButton [mat-dialog-close]="selectedTileId" cdkFocusInitial>Set</button>
 </mat-dialog-actions>

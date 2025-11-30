@@ -2,8 +2,10 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
+import { PlayerSeat } from '../../model/player-seat';
 import { Tile as TileInt } from '../../model/tile';
 import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
+import { TableStore } from '../../store/table-store';
 import { TileChooserDialog } from '../tile-chooser-dialog/tile-chooser-dialog';
 
 @Component({
@@ -16,8 +18,10 @@ import { TileChooserDialog } from '../tile-chooser-dialog/tile-chooser-dialog';
   },
 })
 export class Tile {
+  private tableStore = inject(TableStore);
   private dialog = inject(MatDialog)
   public tile = input.required<TileInt>();
+  public playerId = input.required<PlayerSeat>();
 
   private readonly selected = signal(false);
   public readonly isSelected = computed(() => this.selected());
@@ -27,8 +31,8 @@ export class Tile {
   }
 
   onSet() {
-    this.dialog.open(TileChooserDialog).afterClosed().subscribe(() => {
-
+    this.dialog.open(TileChooserDialog).afterClosed().subscribe((tileId: string) => {
+      this.tableStore.setTile(this.playerId(), this.tile().id, tileId);
     })
   }
 }

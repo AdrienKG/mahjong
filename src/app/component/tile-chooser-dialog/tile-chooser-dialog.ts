@@ -16,5 +16,5 @@ import { TableStore } from '../../store/table-store';
 export class TileChooserDialog {
   public store = inject(TableStore);
 
-  public selectedTileId: number | null = null;
+  public selectedTileId: string | null = null;
 }
