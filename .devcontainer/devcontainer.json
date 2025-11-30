@@ -2,9 +2,7 @@
   "name": "Mahjong",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bullseye",
   "features": {
-    "ghcr.io/devcontainers-extra/features/angular-cli:2": {
-      "version": "20"
-    },
+    "ghcr.io/devcontainers-extra/features/angular-cli:2": {},
     "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
       "theme": "cypher"
     }
