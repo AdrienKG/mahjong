@@ -1,3 +1,4 @@
 @for (tile of currentHand() | sortTiles; track tile.id) {
   <app-tile [playerId]="playerSeat()" [tile]="tile"></app-tile>
 }
+<div>{{ player().wind }}</div>

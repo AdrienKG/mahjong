@@ -6,7 +6,7 @@ import { PlayerSeat } from '../../model/player-seat';
 import { Tile as TileInt } from '../../model/tile';
 import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
 import { TableStore } from '../../store/table-store';
-import { TileChooserDialog } from '../tile-chooser-dialog/tile-chooser-dialog';
+import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog';
 
 @Component({
   selector: 'app-tile',
@@ -19,7 +19,7 @@ import { TileChooserDialog } from '../tile-chooser-dialog/tile-chooser-dialog';
 })
 export class Tile {
   private tableStore = inject(TableStore);
-  private dialog = inject(MatDialog)
+  private dialog = inject(MatDialog);
   public tile = input.required<TileInt>();
   public playerId = input.required<PlayerSeat>();
 
@@ -31,8 +31,13 @@ export class Tile {
   }
 
   onSet() {
-    this.dialog.open(TileChooserDialog).afterClosed().subscribe((tileId: string) => {
-      this.tableStore.setTile(this.playerId(), this.tile().id, tileId);
-    })
+    this.dialog
+      .open(TileSelectorDialog)
+      .afterClosed()
+      .subscribe((tileId: string) => {
+        if (tileId) {
+          this.tableStore.setTile(this.playerId(), this.tile().id, tileId);
+        }
+      });
   }
 }

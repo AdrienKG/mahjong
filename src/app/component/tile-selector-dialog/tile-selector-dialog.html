@@ -1,0 +1,34 @@
+<h2 mat-dialog-title>Choose a tile</h2>
+<mat-dialog-content>
+  <div class="tile-type-buttons">
+    @for (tileType of tileTypes; track tileType) {
+      <button
+        [matButton]="selectedTileType() === tileType ? 'filled' : 'tonal'"
+        (click)="selectedTileType.set(tileType)"
+      >
+        {{ tileType | tileTypeDisplay }}
+      </button>
+    }
+  </div>
+
+  <div class="tile-type-buttons">
+    @for (tile of store.tiles(); track tile.id) {
+      @if (tile.type === selectedTileType()) {
+        <button
+          [matButton]="selectedTileId() === tile.id ? 'filled' : 'tonal'"
+          (click)="
+            selectedTileId.set(selectedTileId() === tile.id ? '' : tile.id)
+          "
+        >
+          {{ tile | tileDisplay }}
+        </button>
+      }
+    }
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button matButton mat-dialog-close>Cancel</button>
+  <button matButton [mat-dialog-close]="selectedTileId()" cdkFocusInitial>
+    Set
+  </button>
+</mat-dialog-actions>

@@ -26,7 +26,9 @@ export class TileDisplayPipe implements PipeTransform {
           character = long ? 'Dot' : 'D';
           break;
       }
-      return long ? `${tile.number} ${character}` : `${tile.number}${character}`;
+      return long
+        ? `${tile.number} ${character}`
+        : `${tile.number}${character}`;
     }
     if (value.type === TileType.HONOUR) {
       const tile = value as HonourTile;
@@ -35,7 +37,7 @@ export class TileDisplayPipe implements PipeTransform {
           case DragonType.GREEN:
             return long ? 'Green Dragon' : 'GD';
           case DragonType.RED:
-            return long ? 'Red Dragon': 'RD';
+            return long ? 'Red Dragon' : 'RD';
           case DragonType.WHITE:
             return long ? 'White Dragon' : 'WD';
         }
@@ -64,7 +66,9 @@ export class TileDisplayPipe implements PipeTransform {
           character = long ? 'South' : 'S';
           break;
       }
-      return long ? `${tile.number} ${character}` : `${tile.number}${character}`;
+      return long
+        ? `${tile.number} ${character}`
+        : `${tile.number}${character}`;
     }
     if (value.type === TileType.UNKNOWN) {
       return '??';

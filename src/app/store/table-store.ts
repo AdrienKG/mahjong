@@ -25,7 +25,8 @@ import { WindType } from '../model/wind-type';
 type TableState = {
   wind: WindType;
   discard: Tile[];
-  wall: Tile[]; //wall and other player hidden hands
+  tiles: Tile[];
+  wall: number;
   drawnFromWall: boolean;
   drawnFromDeadWall: boolean;
 };
@@ -122,7 +123,8 @@ const setupTiles = (): Tile[] => {
 const initialState: TableState = {
   wind: WindType.EAST,
   discard: [],
-  wall: setupTiles(),
+  tiles: setupTiles(),
+  wall: 92,
   drawnFromWall: false,
   drawnFromDeadWall: false,
 };
@@ -139,7 +141,7 @@ export const TableStore = signalStore(
           {
             id: PlayerSeat.current,
             wind: WindType.EAST,
-            tiles: Array.from({ length: 14 }).map(
+            tiles: Array.from({ length: 13 }).map(
               () =>
                 ({
                   id: uuidv4(),
@@ -192,9 +194,9 @@ export const TableStore = signalStore(
       );
     },
     pickupTile() {
-      const wall = store.wall();
-      const indexToRemove = Math.floor(Math.random() * (wall.length - 1));
-      const tile = wall[indexToRemove];
+      const tiles = store.tiles();
+      const indexToRemove = Math.floor(Math.random() * (tiles.length - 1));
+      const tile = tiles[indexToRemove];
 
       const currentPlayerTiles = store.entities()[0].tiles;
       currentPlayerTiles.push(tile);
@@ -202,22 +204,22 @@ export const TableStore = signalStore(
       patchState(
         store,
         updateEntity({ id: 0, changes: { tiles: [...currentPlayerTiles] } }),
+        (state) => ({
+          tiles: [
+            ...state.tiles.slice(0, indexToRemove),
+            ...state.tiles.slice(indexToRemove + 1),
+          ],
+          wall: state.wall - 1,
+        }),
       );
-      patchState(store, (state) => ({
-        wall: [
-          ...state.wall.slice(0, indexToRemove),
-          ...state.wall.slice(indexToRemove + 1),
-        ],
-      }));
     },
     setTile(playerId: PlayerSeat, tileId: string, newTileId: string) {
-      const wall = store.wall();
-      const wallTileIndex = wall.findIndex((t) => t.id === newTileId);
-      const wallTile = wall[wallTileIndex];
+      const tiles = store.tiles();
+      const wallTileIndex = tiles.findIndex((t) => t.id === newTileId);
+      const wallTile = tiles[wallTileIndex];
 
       const player = store.entities().find((p) => p.id === playerId);
       const playerTileIndex = player?.tiles.findIndex((t) => t.id === tileId);
-      const playerTile = player?.tiles[playerTileIndex!];
 
       player!.tiles[playerTileIndex!] = wallTile;
 
@@ -232,17 +234,8 @@ export const TableStore = signalStore(
           patchState(
             store,
             updateEntity({ id: 0, changes: { wind: WindType.EAST } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 1, changes: { wind: WindType.SOUTH } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 2, changes: { wind: WindType.WEST } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 3, changes: { wind: WindType.NORTH } }),
           );
           break;
@@ -250,17 +243,8 @@ export const TableStore = signalStore(
           patchState(
             store,
             updateEntity({ id: 0, changes: { wind: WindType.SOUTH } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 1, changes: { wind: WindType.WEST } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 2, changes: { wind: WindType.NORTH } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 3, changes: { wind: WindType.EAST } }),
           );
           break;
@@ -268,17 +252,8 @@ export const TableStore = signalStore(
           patchState(
             store,
             updateEntity({ id: 0, changes: { wind: WindType.WEST } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 1, changes: { wind: WindType.NORTH } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 2, changes: { wind: WindType.EAST } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 3, changes: { wind: WindType.SOUTH } }),
           );
           break;
@@ -286,17 +261,8 @@ export const TableStore = signalStore(
           patchState(
             store,
             updateEntity({ id: 0, changes: { wind: WindType.NORTH } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 1, changes: { wind: WindType.EAST } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 2, changes: { wind: WindType.SOUTH } }),
-          );
-          patchState(
-            store,
             updateEntity({ id: 3, changes: { wind: WindType.WEST } }),
           );
           break;
@@ -408,7 +374,7 @@ export const TableStore = signalStore(
       }
     },
     drawn15FromEnd() {
-      return store.wall().length === 14;
+      return store.wall() === 14;
     },
     simpleNumbersOdds() {
       const currentPlayer = store.entities()[0];

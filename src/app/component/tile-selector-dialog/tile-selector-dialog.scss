@@ -1,0 +1,9 @@
+.tile-type-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  + .tile-type-buttons {
+    margin-block-start: 1rem;
+  }
+}

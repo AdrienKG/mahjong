@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Choose a wind</h2>
+<mat-dialog-content>
+  <button
+    [matButton]="selectedWind() === windType.EAST ? 'filled' : 'tonal'"
+    (click)="selectedWind.set(windType.EAST)"
+  >
+    East
+  </button>
+  <button
+    [matButton]="selectedWind() === windType.SOUTH ? 'filled' : 'tonal'"
+    (click)="selectedWind.set(windType.SOUTH)"
+  >
+    South
+  </button>
+  <button
+    [matButton]="selectedWind() === windType.WEST ? 'filled' : 'tonal'"
+    (click)="selectedWind.set(windType.WEST)"
+  >
+    West
+  </button>
+  <button
+    [matButton]="selectedWind() === windType.NORTH ? 'filled' : 'tonal'"
+    (click)="selectedWind.set(windType.NORTH)"
+  >
+    North
+  </button>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button matButton mat-dialog-close>Cancel</button>
+  <button matButton [mat-dialog-close]="selectedWind()" cdkFocusInitial>
+    Set
+  </button>
+</mat-dialog-actions>

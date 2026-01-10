@@ -18,9 +18,11 @@ export class Player {
 
   playerSeat = input.required<PlayerSeat>();
 
+  player = computed(() => this.tableStore.entities()[this.playerSeat()]);
+
   public currentHand = computed(() => {
-    if (this.tableStore.entities()[this.playerSeat()]) {
-      return this.tableStore.entities()[this.playerSeat()].tiles;
+    if (this.player()) {
+      return this.player().tiles;
     }
     return [];
   });
