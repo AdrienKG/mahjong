@@ -1,9 +1,22 @@
-<app-player class="right" [playerSeat]="playerSeat.right"></app-player>
-<app-player class="across" [playerSeat]="playerSeat.across"></app-player>
-<app-player class="left" [playerSeat]="playerSeat.left"></app-player>
-<app-player class="player" [playerSeat]="playerSeat.current"></app-player>
-<div class="discard"></div>
-<div class="extra">
+<div class="table-rows">
+  <div class="row north">
+    <app-player [playerSeat]="playerSeat.left"></app-player>
+  </div>
+
+  <div class="row west">
+    <app-player [playerSeat]="playerSeat.across"></app-player>
+  </div>
+
+  <div class="row south">
+    <app-player [playerSeat]="playerSeat.right"></app-player>
+  </div>
+
+  <div class="row east">
+    <app-player [playerSeat]="playerSeat.current"></app-player>
+  </div>
+</div>
+
+<div class="extra controls">
   <button mat-button (click)="onPickup()">pickup</button>
   <button mat-button (click)="onChangeWind()">Change Wind</button>
 </div>

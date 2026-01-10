@@ -4,6 +4,10 @@
   &.vertical {
     flex-direction: column;
   }
+
+  .wind-label {
+    padding: 0.15rem 0.35rem;
+  }
 }
 
 button {

@@ -1,56 +1,39 @@
 :host {
-  --table-size: 50rem;
-
-  height: var(--table-size);
-  width: var(--table-size);
   border: 0.25rem solid green;
 
-  display: grid;
-  grid-template-areas:
-    ".     across  .    "
-    "right discard left "
-    ".     player  .    "
-    "extra extra   extra";
-  grid-template-columns: auto 1fr auto;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-sizing: border-box;
 }
 
-.across {
-  border: 0.25rem solid red;
-
-  grid-area: across;
+.table-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1 1 auto;
 }
 
-.discard {
-  grid-area: discard;
+.row {
+  border: 0.15rem solid rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 0; /* will be set by flex */
+  flex: 1 1 0%;
 }
 
-.extra {
-  grid-area: extra;
+.row.north { border-color: yellow; }
+.row.west { border-color: red; }
+.row.south { border-color: purple; }
+.row.east { border-color: blue; }
+
+.controls.extra {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 0.5rem;
 }
 
-.left {
-  border: 0.25rem solid yellow;
-
-  grid-area: left;
-}
-
-.odds {
-  background-color: greenyellow;
-  position: absolute;
-  right: 0;
-  height: 100%;
-  overflow-y: auto;
-}
-
-.player {
-  border: 0.25rem solid blue;
-
-  grid-area: player;
-}
-
-.right {
-  border: 0.25rem solid purple;
-
-  grid-area: right;
-}
+.discard { display: none; }

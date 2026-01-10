@@ -1,17 +1,15 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { PlayerSeat } from '../../model/player-seat';
 import { SortTilesPipe } from '../../pipe/sort-tiles-pipe';
+import { WindTypeDisplayPipe } from '../../pipe/wind-type-display-pipe';
 import { TableStore } from '../../store/table-store';
 import { Tile } from '../tile/tile';
 
 @Component({
   selector: 'app-player',
-  imports: [SortTilesPipe, Tile],
+  imports: [SortTilesPipe, Tile, WindTypeDisplayPipe],
   templateUrl: './player.html',
-  styleUrl: './player.scss',
-  host: {
-    '[class.vertical]': 'this.playerSeat() === 1 || this.playerSeat() === 3',
-  },
+  styleUrl: './player.scss'
 })
 export class Player {
   tableStore = inject(TableStore);

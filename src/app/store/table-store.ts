@@ -193,17 +193,45 @@ export const TableStore = signalStore(
         ] as Player[]),
       );
     },
-    pickupTile() {
+    pickupTile(playerId?: PlayerSeat, playerTileId?: string, newTileId?: string) {
       const tiles = store.tiles();
-      const indexToRemove = Math.floor(Math.random() * (tiles.length - 1));
-      const tile = tiles[indexToRemove];
+      if (!tiles || tiles.length === 0) return;
 
-      const currentPlayerTiles = store.entities()[0].tiles;
-      currentPlayerTiles.push(tile);
+      // Determine which tile from the wall to take
+      let indexToRemove: number;
+      let tile: Tile;
+
+      if (newTileId) {
+        indexToRemove = tiles.findIndex((t) => t.id === newTileId);
+        if (indexToRemove === -1) return;
+        tile = tiles[indexToRemove];
+      } else {
+        indexToRemove = Math.floor(Math.random() * tiles.length);
+        tile = tiles[indexToRemove];
+      }
+
+      // Determine target player (default to current)
+      const targetPlayer =
+        playerId !== undefined
+          ? store.entities().find((p) => p.id === playerId)
+          : store.entities()[0];
+      if (!targetPlayer) return;
+
+      // If a specific player tile id is provided, replace that tile; otherwise push the picked tile
+      if (playerTileId) {
+        const playerTileIndex = targetPlayer.tiles.findIndex((t) => t.id === playerTileId);
+        if (playerTileIndex === -1) {
+          targetPlayer.tiles.push(tile);
+        } else {
+          targetPlayer.tiles[playerTileIndex] = tile;
+        }
+      } else {
+        targetPlayer.tiles.push(tile);
+      }
 
       patchState(
         store,
-        updateEntity({ id: 0, changes: { tiles: [...currentPlayerTiles] } }),
+        updateEntity({ id: targetPlayer.id, changes: { tiles: [...targetPlayer.tiles] } }),
         (state) => ({
           tiles: [
             ...state.tiles.slice(0, indexToRemove),
@@ -211,21 +239,6 @@ export const TableStore = signalStore(
           ],
           wall: state.wall - 1,
         }),
-      );
-    },
-    setTile(playerId: PlayerSeat, tileId: string, newTileId: string) {
-      const tiles = store.tiles();
-      const wallTileIndex = tiles.findIndex((t) => t.id === newTileId);
-      const wallTile = tiles[wallTileIndex];
-
-      const player = store.entities().find((p) => p.id === playerId);
-      const playerTileIndex = player?.tiles.findIndex((t) => t.id === tileId);
-
-      player!.tiles[playerTileIndex!] = wallTile;
-
-      patchState(
-        store,
-        updateEntity({ id: playerId, changes: { tiles: [...player!.tiles] } }),
       );
     },
     updateWind(wind: WindType) {
@@ -267,6 +280,35 @@ export const TableStore = signalStore(
           );
           break;
       }
+    },
+    discardTile(playerId: PlayerSeat, tileId: string) {
+      const player = store.entities().find((p) => p.id === playerId);
+      if (!player) return;
+
+      const playerTileIndex = player.tiles.findIndex((t) => t.id === tileId);
+      if (playerTileIndex === -1) return;
+
+      const [removedTile] = player.tiles.splice(playerTileIndex, 1);
+
+      patchState(
+        store,
+        updateEntity({ id: playerId, changes: { tiles: [...player.tiles] } }),
+        (state) => {
+          const wallIndex = state.tiles.findIndex((t) => t.id === removedTile.id);
+          const tiles =
+            wallIndex === -1
+              ? state.tiles
+              : [
+                  ...state.tiles.slice(0, wallIndex),
+                  ...state.tiles.slice(wallIndex + 1),
+                ];
+          return {
+            tiles,
+            discard: [...state.discard, removedTile],
+            wall: wallIndex === -1 ? state.wall : state.wall - 1,
+          };
+        },
+      );
     },
   })),
   // Hands

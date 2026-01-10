@@ -12,7 +12,7 @@
   </div>
 
   <div class="tile-type-buttons">
-    @for (tile of store.tiles(); track tile.id) {
+    @for (tile of store.tiles() |sortTiles ; track tile.id) {
       @if (tile.type === selectedTileType()) {
         <button
           [matButton]="selectedTileId() === tile.id ? 'filled' : 'tonal'"
