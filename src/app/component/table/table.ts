@@ -31,4 +31,16 @@ export class Table {
         this.tableStore.updateWind(wind);
       });
   }
+
+  onRandomizeHand() {
+    const players = this.tableStore.entities();
+    const currentPlayer = players[0];
+    if (!currentPlayer) return;
+
+    // Clone the current tile list so we replace each placeholder deterministically
+    const tilesToReplace = [...currentPlayer.tiles];
+    tilesToReplace.forEach((tile) => {
+      this.tableStore.pickupTile(currentPlayer.id as any, tile.id);
+    });
+  }
 }
