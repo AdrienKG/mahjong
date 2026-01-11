@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { PlayerSeat } from '../../model/player-seat';
 import { Tile as TileInt } from '../../model/tile';
@@ -11,7 +12,7 @@ import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog
 
 @Component({
   selector: 'app-tile',
-  imports: [MatButtonModule, MatMenuModule, TileDisplayPipe],
+  imports: [MatButtonModule, MatMenuModule, MatIconModule, TileDisplayPipe],
   templateUrl: './tile.html',
   styleUrl: './tile.scss',
   host: {
@@ -27,6 +28,11 @@ export class Tile {
   private readonly selected = signal(false);
   public readonly isSelected = computed(() => this.selected());
   public readonly isUnknown = computed(() => this.tile().type === TileType.UNKNOWN);
+  public readonly isExposed = computed(() => {
+    const player = this.tableStore.entities().find((p) => p.id === this.playerId());
+    if (!player) return false;
+    return player.exposedTiles.some((t) => t.id === this.tile().id);
+  });
 
   onClick() {
     this.selected.update((value) => !value);
@@ -45,5 +51,9 @@ export class Tile {
 
   onDiscard() {
     this.tableStore.discardTile(this.playerId(), this.tile().id);
+  }
+
+  onToggleExpose() {
+    this.tableStore.toggleExposeTile(this.playerId(), this.tile().id);
   }
 }

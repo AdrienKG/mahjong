@@ -20,7 +20,7 @@ export class Player {
 
   public currentHand = computed(() => {
     if (this.player()) {
-      return this.player().tiles;
+      return [...this.player().exposedTiles, ...this.player().tiles];
     }
     return [];
   });

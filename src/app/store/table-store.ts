@@ -310,6 +310,34 @@ export const TableStore = signalStore(
         },
       );
     },
+    toggleExposeTile(playerId: PlayerSeat, tileId: string) {
+      const player = store.entities().find((p) => p.id === playerId);
+      if (!player) return;
+
+      const exposedIndex = player.exposedTiles.findIndex((t) => t.id === tileId);
+
+      if (exposedIndex !== -1) {
+        // Currently exposed -> unexpose (move back to player's tiles)
+        const [removed] = player.exposedTiles.splice(exposedIndex, 1);
+        player.tiles.push(removed);
+
+        patchState(
+          store,
+          updateEntity({ id: playerId, changes: { tiles: [...player.tiles], exposedTiles: [...player.exposedTiles] } }),
+        );
+      } else {
+        // Not exposed -> expose (move from player's tiles to exposedTiles)
+        const playerTileIndex = player.tiles.findIndex((t) => t.id === tileId);
+        if (playerTileIndex === -1) return;
+        const [removed] = player.tiles.splice(playerTileIndex, 1);
+        player.exposedTiles.push(removed);
+
+        patchState(
+          store,
+          updateEntity({ id: playerId, changes: { tiles: [...player.tiles], exposedTiles: [...player.exposedTiles] } }),
+        );
+      }
+    },
   })),
   // Hands
   withComputed((store) => ({

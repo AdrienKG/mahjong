@@ -6,6 +6,7 @@
 }
 
 .tile {
+  position: relative;
   &:hover {
     border: 0.125rem blue solid;
   }
@@ -20,4 +21,12 @@
       text-container-height: 5rem,
     )
   );
+
+.expose-icon {
+  position: absolute;
+  top: 0rem;
+  right: -0.25rem;
+  opacity: 0.25;
+  color: #000;
+}
 }
