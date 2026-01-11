@@ -193,7 +193,11 @@ export const TableStore = signalStore(
         ] as Player[]),
       );
     },
-    pickupTile(playerId?: PlayerSeat, playerTileId?: string, newTileId?: string) {
+    pickupTile(
+      playerId?: PlayerSeat,
+      playerTileId?: string,
+      newTileId?: string,
+    ) {
       const tiles = store.tiles();
       if (!tiles || tiles.length === 0) return;
 
@@ -219,7 +223,9 @@ export const TableStore = signalStore(
 
       // If a specific player tile id is provided, replace that tile; otherwise push the picked tile
       if (playerTileId) {
-        const playerTileIndex = targetPlayer.tiles.findIndex((t) => t.id === playerTileId);
+        const playerTileIndex = targetPlayer.tiles.findIndex(
+          (t) => t.id === playerTileId,
+        );
         if (playerTileIndex === -1) {
           targetPlayer.tiles.push(tile);
         } else {
@@ -231,7 +237,10 @@ export const TableStore = signalStore(
 
       patchState(
         store,
-        updateEntity({ id: targetPlayer.id, changes: { tiles: [...targetPlayer.tiles] } }),
+        updateEntity({
+          id: targetPlayer.id,
+          changes: { tiles: [...targetPlayer.tiles] },
+        }),
         (state) => ({
           tiles: [
             ...state.tiles.slice(0, indexToRemove),
@@ -294,7 +303,9 @@ export const TableStore = signalStore(
         store,
         updateEntity({ id: playerId, changes: { tiles: [...player.tiles] } }),
         (state) => {
-          const wallIndex = state.tiles.findIndex((t) => t.id === removedTile.id);
+          const wallIndex = state.tiles.findIndex(
+            (t) => t.id === removedTile.id,
+          );
           const tiles =
             wallIndex === -1
               ? state.tiles
@@ -314,7 +325,9 @@ export const TableStore = signalStore(
       const player = store.entities().find((p) => p.id === playerId);
       if (!player) return;
 
-      const exposedIndex = player.exposedTiles.findIndex((t) => t.id === tileId);
+      const exposedIndex = player.exposedTiles.findIndex(
+        (t) => t.id === tileId,
+      );
 
       if (exposedIndex !== -1) {
         // Currently exposed -> unexpose (move back to player's tiles)
@@ -323,7 +336,13 @@ export const TableStore = signalStore(
 
         patchState(
           store,
-          updateEntity({ id: playerId, changes: { tiles: [...player.tiles], exposedTiles: [...player.exposedTiles] } }),
+          updateEntity({
+            id: playerId,
+            changes: {
+              tiles: [...player.tiles],
+              exposedTiles: [...player.exposedTiles],
+            },
+          }),
         );
       } else {
         // Not exposed -> expose (move from player's tiles to exposedTiles)
@@ -334,7 +353,13 @@ export const TableStore = signalStore(
 
         patchState(
           store,
-          updateEntity({ id: playerId, changes: { tiles: [...player.tiles], exposedTiles: [...player.exposedTiles] } }),
+          updateEntity({
+            id: playerId,
+            changes: {
+              tiles: [...player.tiles],
+              exposedTiles: [...player.exposedTiles],
+            },
+          }),
         );
       }
     },

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ProbabilityPipe } from '../../pipe/probability-pipe';
 import { TableStore } from '../../store/table-store';
-import { HandScore } from "../hand-score/hand-score";
+import { HandScore } from '../hand-score/hand-score';
 
 @Component({
   selector: 'app-odds-panel',

@@ -27,9 +27,13 @@ export class Tile {
 
   private readonly selected = signal(false);
   public readonly isSelected = computed(() => this.selected());
-  public readonly isUnknown = computed(() => this.tile().type === TileType.UNKNOWN);
+  public readonly isUnknown = computed(
+    () => this.tile().type === TileType.UNKNOWN,
+  );
   public readonly isExposed = computed(() => {
-    const player = this.tableStore.entities().find((p) => p.id === this.playerId());
+    const player = this.tableStore
+      .entities()
+      .find((p) => p.id === this.playerId());
     if (!player) return false;
     return player.exposedTiles.some((t) => t.id === this.tile().id);
   });

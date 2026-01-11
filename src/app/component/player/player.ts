@@ -9,7 +9,7 @@ import { Tile } from '../tile/tile';
   selector: 'app-player',
   imports: [SortTilesPipe, Tile, WindTypeDisplayPipe],
   templateUrl: './player.html',
-  styleUrl: './player.scss'
+  styleUrl: './player.scss',
 })
 export class Player {
   tableStore = inject(TableStore);

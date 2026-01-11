@@ -8,9 +8,8 @@ describe('HandScore', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HandScore]
-    })
-    .compileComponents();
+      imports: [HandScore],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HandScore);
     component = fixture.componentInstance;

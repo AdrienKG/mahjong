@@ -5,10 +5,16 @@
   [matContextMenuTriggerFor]="contextMenu"
 >
   {{ tile() | tileDisplay }}
-  <mat-icon class="expose-icon" aria-hidden="true">{{ isExposed() ? 'visibility' : 'visibility_off' }}</mat-icon>
+  <mat-icon class="expose-icon" aria-hidden="true">{{
+    isExposed() ? "visibility" : "visibility_off"
+  }}</mat-icon>
 </button>
 <mat-menu #contextMenu>
-  <button mat-menu-item (click)="onDiscard()" [disabled]="isUnknown()">Discard</button>
+  <button mat-menu-item (click)="onDiscard()" [disabled]="isUnknown()">
+    Discard
+  </button>
   <button mat-menu-item (click)="onSet()">Set</button>
-  <button mat-menu-item (click)="onToggleExpose()" [disabled]="isUnknown()">Expose</button>
+  <button mat-menu-item (click)="onToggleExpose()" [disabled]="isUnknown()">
+    Expose
+  </button>
 </mat-menu>

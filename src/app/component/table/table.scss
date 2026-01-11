@@ -24,10 +24,18 @@
   flex: 1 1 0%;
 }
 
-.row.north { border-color: yellow; }
-.row.west { border-color: red; }
-.row.south { border-color: purple; }
-.row.east { border-color: blue; }
+.row.north {
+  border-color: yellow;
+}
+.row.west {
+  border-color: red;
+}
+.row.south {
+  border-color: purple;
+}
+.row.east {
+  border-color: blue;
+}
 
 .controls.extra {
   display: flex;
@@ -36,4 +44,6 @@
   padding: 0.5rem;
 }
 
-.discard { display: none; }
+.discard {
+  display: none;
+}
