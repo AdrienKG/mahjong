@@ -9,6 +9,6 @@
 </button>
 <mat-menu #contextMenu>
   <button mat-menu-item (click)="onDiscard()" [disabled]="isUnknown()">Discard</button>
-  <button mat-menu-item (click)="onSet()" [disabled]="!isUnknown()">Set</button>
+  <button mat-menu-item (click)="onSet()">Set</button>
   <button mat-menu-item (click)="onToggleExpose()" [disabled]="isUnknown()">Expose</button>
 </mat-menu>
