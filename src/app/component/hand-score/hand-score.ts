@@ -13,7 +13,8 @@ export class HandScore {
   private tableStore = inject(TableStore);
 
   suiteCount = 3;
-  counts = computed<number[][]>(() => {
+
+  private counts = computed<number[][]>(() => {
     const currentPlayer = this.tableStore.entities()[0];
 
     const tiles = currentPlayer.tiles;
@@ -31,6 +32,10 @@ export class HandScore {
   allChi = computed<boolean>(() => {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
+
+    if (tiles.length !== 14 ) {
+      return false;
+    }
 
     // All tiles must be suited (no winds/dragons/bonus)
     if (tiles.some((t) => t.type !== TileType.SUITED)) {
@@ -62,7 +67,9 @@ export class HandScore {
           // You need a pair (eyes) for a valid hand. Don't bother checking without it.
           const clone = this.counts().map((arr) => arr.slice());
           clone[s][n] -= 2; // remove the pair (eyes)
-          return canFormChis(clone);
+          if (canFormChis(clone)) {
+            return true;
+          }
         }
       }
     }
@@ -74,7 +81,11 @@ export class HandScore {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    // No honours allowed
+    if (tiles.length !== 14) {
+      return false;
+    }
+
+    // No honours or dragons allowed
     if (tiles.some((t) => t.type !== TileType.SUITED)) {
       return false;
     }
@@ -126,7 +137,9 @@ export class HandScore {
           // You need a pair (eyes) for a valid hand. Don't bother checking without it.
           const clone = this.counts().map((arr) => arr.slice());
           clone[s][n] -= 2; // remove pair
-          return canFormMelds(clone);
+          if (canFormMelds(clone)) {
+            return true;
+          }
         }
       }
     }

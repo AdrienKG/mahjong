@@ -207,7 +207,9 @@ export const TableStore = signalStore(
 
       if (newTileId) {
         indexToRemove = tiles.findIndex((t) => t.id === newTileId);
-        if (indexToRemove === -1) return;
+        if (indexToRemove === -1) {
+            return;
+          }
         tile = tiles[indexToRemove];
       } else {
         indexToRemove = Math.floor(Math.random() * tiles.length);
@@ -219,27 +221,30 @@ export const TableStore = signalStore(
         playerId !== undefined
           ? store.entities().find((p) => p.id === playerId)
           : store.entities()[0];
-      if (!targetPlayer) return;
+      if (!targetPlayer) {
+        return;
+      }
 
       // If a specific player tile id is provided, replace that tile; otherwise push the picked tile
+      let playerTiles = [...targetPlayer.tiles];
       if (playerTileId) {
-        const playerTileIndex = targetPlayer.tiles.findIndex(
+        const playerTileIndex = playerTiles.findIndex(
           (t) => t.id === playerTileId,
         );
         if (playerTileIndex === -1) {
-          targetPlayer.tiles.push(tile);
+          playerTiles.push(tile);
         } else {
-          targetPlayer.tiles[playerTileIndex] = tile;
+          playerTiles[playerTileIndex] = tile;
         }
       } else {
-        targetPlayer.tiles.push(tile);
+        playerTiles.push(tile);
       }
 
       patchState(
         store,
         updateEntity({
           id: targetPlayer.id,
-          changes: { tiles: [...targetPlayer.tiles] },
+          changes: { tiles: playerTiles },
         }),
         (state) => ({
           tiles: [
