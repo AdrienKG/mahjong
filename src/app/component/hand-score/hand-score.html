@@ -1,6 +1,8 @@
 <div>
   <div><b>All Chi Hand</b>: 4 Chis + pair of Eyes, no Winds or Dragons</div>
-  {{ allChi() ? "Yes" : "No" }}
+  {{ allChi() > 0 ? allChi() : "No" }}
   <div><b>Mixed Two Suit Hand</b>: 4 melds + pair of Eyes, only two suits, no Winds or Dragons</div>
-  {{ mixedTwoSuit() ? "Yes" : "No" }}
+  {{ mixedTwoSuit() > 0 ? mixedTwoSuit() : "No" }}
+  <div><b>All Pung Hand</b>: Mixed Suits, may include Winds and Dragons. Additional 3 points if tiles are all either even or odd numbers.</div>
+  {{ allPung() > 0 ? allPung() : "No" }}
 </div>
