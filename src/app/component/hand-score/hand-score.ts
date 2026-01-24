@@ -166,6 +166,31 @@ export class HandScore {
     return allPairs ? baseScore : DEFAULT_NO_SCORE;
   });
 
+  bigSevenPairs = computed<number>(() => {
+    const baseScore = 9;
+    const currentPlayer = this.tableStore.entities()[0];
+    const tiles = currentPlayer.tiles;
+
+    if (tiles.length !== 14) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    // Only suited tiles allowed (no winds or dragons)
+    if (tiles.some((t) => t.type !== TileType.SUITED)) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    // Try consecutive numbers 1-7, 2-8, 3-9
+    for (let startNum = 1; startNum <= 3; startNum++) {
+      const endNum = startNum + 6; // 7 consecutive numbers
+      if (this.hasPairsInSequence(startNum, endNum)) {
+        return baseScore;
+      }
+    }
+
+    return DEFAULT_NO_SCORE;
+  });
+
   private canFormChis(c: number[][]): boolean {
     for (let s = 0; s < SUITE_COUNT; s++) {
       for (let n = 1; n <= 9; n++) {
@@ -243,5 +268,23 @@ export class HandScore {
     const dragonType = tile.dragonType ?? 'none';
 
     return `${type}-${suite}-${number}-${windType}-${dragonType}`;
+  }
+
+  private hasPairsInSequence(startNum: number, endNum: number): boolean {
+    // Check if we have pairs for each number in the sequence startNum to endNum
+    for (let n = startNum; n <= endNum; n++) {
+      let pairFound = false;
+      // Check across all suites for a pair of this number
+      for (let s = 0; s < SUITE_COUNT; s++) {
+        if (this.counts()[s][n] >= 2) {
+          pairFound = true;
+          break;
+        }
+      }
+      if (!pairFound) {
+        return false;
+      }
+    }
+    return true;
   }
 }
