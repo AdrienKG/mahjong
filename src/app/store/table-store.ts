@@ -208,8 +208,8 @@ export const TableStore = signalStore(
       if (newTileId) {
         indexToRemove = tiles.findIndex((t) => t.id === newTileId);
         if (indexToRemove === -1) {
-            return;
-          }
+          return;
+        }
         tile = tiles[indexToRemove];
       } else {
         indexToRemove = Math.floor(Math.random() * tiles.length);

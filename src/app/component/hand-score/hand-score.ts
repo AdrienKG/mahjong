@@ -35,7 +35,7 @@ export class HandScore {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== 14 ) {
+    if (tiles.length !== 14) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -162,7 +162,9 @@ export class HandScore {
       return DEFAULT_NO_SCORE;
     }
 
-    const allPairs = Array.from(tileCount.values()).every((count) => count === 2);
+    const allPairs = Array.from(tileCount.values()).every(
+      (count) => count === 2,
+    );
     return allPairs ? baseScore : DEFAULT_NO_SCORE;
   });
 
@@ -191,6 +193,55 @@ export class HandScore {
     return DEFAULT_NO_SCORE;
   });
 
+  purityHand = computed<number>(() => {
+    const baseScore = 9;
+    const currentPlayer = this.tableStore.entities()[0];
+    const tiles = currentPlayer.tiles;
+
+    if (tiles.length !== 14) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    // Only suited tiles allowed (no winds or dragons)
+    if (tiles.some((t) => t.type !== TileType.SUITED)) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    // All tiles must be from the same suit
+    const suitsUsed = new Set<number>();
+    tiles.forEach((t) => suitsUsed.add((t as SuitedTile).suite));
+    if (suitsUsed.size !== 1) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    // Try every possible pair choice
+    const suitIndex = Array.from(suitsUsed)[0];
+    for (let n = 1; n <= 9; n++) {
+      if (this.counts()[suitIndex][n] >= 2) {
+        // Try removing this pair and forming chis/pungs/kongs with remaining
+        const clone = this.counts().map((arr) => arr.slice());
+        clone[suitIndex][n] -= 2; // remove pair (eyes)
+
+        if (this.canFormMelds(clone, suitIndex)) {
+          return baseScore;
+        }
+      }
+    }
+
+    return DEFAULT_NO_SCORE;
+  });
+
+  hasHandScore(): boolean {
+    return (
+      this.allChi() > 0 ||
+      this.mixedTwoSuit() > 0 ||
+      this.allPung() > 0 ||
+      this.littleSevenPairs() > 0 ||
+      this.bigSevenPairs() > 0 ||
+      this.purityHand() > 0
+    );
+  }
+  
   private canFormChis(c: number[][]): boolean {
     for (let s = 0; s < SUITE_COUNT; s++) {
       for (let n = 1; n <= 9; n++) {
@@ -208,14 +259,18 @@ export class HandScore {
     return true;
   }
 
-  private canFormMelds(c: number[][]): boolean {
-    for (let s = 0; s < SUITE_COUNT; s++) {
+  private canFormMelds(c: number[][], suitIndex?: number): boolean {
+    // If suitIndex is specified, only check that suite; otherwise check all suites
+    const startSuite = suitIndex ?? 0;
+    const endSuite = suitIndex ?? SUITE_COUNT - 1;
+
+    for (let s = startSuite; s <= endSuite; s++) {
       for (let n = 1; n <= 9; n++) {
         if (c[s][n] > 0) {
           // Try pung/kong (remove 3)
           if (c[s][n] >= 3) {
             c[s][n] -= 3;
-            if (this.canFormMelds(c)) {
+            if (this.canFormMelds(c, suitIndex)) {
               return true;
             }
             c[s][n] += 3;
@@ -226,7 +281,7 @@ export class HandScore {
             c[s][n]--;
             c[s][n + 1]--;
             c[s][n + 2]--;
-            if (this.canFormMelds(c)) {
+            if (this.canFormMelds(c, suitIndex)) {
               return true;
             }
             c[s][n]++;
