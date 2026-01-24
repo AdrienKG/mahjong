@@ -141,6 +141,31 @@ export class HandScore {
     return DEFAULT_NO_SCORE;
   });
 
+  littleSevenPairs = computed<number>(() => {
+    const baseScore = 6;
+    const currentPlayer = this.tableStore.entities()[0];
+    const tiles = currentPlayer.tiles;
+
+    if (tiles.length !== 14) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    // Count tiles - need exactly 7 pairs (each tile appears exactly 2 times)
+    const tileCount = new Map<string, number>();
+    tiles.forEach((tile) => {
+      const key = this.getTileKey(tile);
+      tileCount.set(key, (tileCount.get(key) ?? 0) + 1);
+    });
+
+    // Must have exactly 7 entries (7 pairs) with each count being exactly 2
+    if (tileCount.size !== 7) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    const allPairs = Array.from(tileCount.values()).every((count) => count === 2);
+    return allPairs ? baseScore : DEFAULT_NO_SCORE;
+  });
+
   private canFormChis(c: number[][]): boolean {
     for (let s = 0; s < SUITE_COUNT; s++) {
       for (let n = 1; n <= 9; n++) {
@@ -208,5 +233,15 @@ export class HandScore {
       }
     }
     return true;
+  }
+
+  private getTileKey(tile: any): string {
+    const type = tile.type;
+    const suite = tile.suite ?? 'none';
+    const number = tile.number ?? 'none';
+    const windType = tile.windType ?? 'none';
+    const dragonType = tile.dragonType ?? 'none';
+
+    return `${type}-${suite}-${number}-${windType}-${dragonType}`;
   }
 }
