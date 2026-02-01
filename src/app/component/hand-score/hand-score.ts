@@ -10,7 +10,7 @@ const SUITE_COUNT = 3;
   selector: 'app-hand-score',
   imports: [],
   templateUrl: './hand-score.html',
-  styleUrl: './hand-score.css',
+  styleUrl: './hand-score.scss',
 })
 export class HandScore {
   private tableStore = inject(TableStore);
@@ -229,6 +229,17 @@ export class HandScore {
     }
 
     return DEFAULT_NO_SCORE;
+  });
+
+  totalPoints = computed<number>(() => {
+    return (
+      this.allChi() +
+      this.mixedTwoSuit() +
+      this.allPung() +
+      this.littleSevenPairs() +
+      this.bigSevenPairs() +
+      this.purityHand()
+    );
   });
 
   hasHandScore(): boolean {
