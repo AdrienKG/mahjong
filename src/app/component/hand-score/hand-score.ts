@@ -5,6 +5,8 @@ import { TableStore } from '../../store/table-store';
 
 const DEFAULT_NO_SCORE = 0;
 const SUITE_COUNT = 3;
+const MIN_HAND_SIZE = 14;
+const MAX_HAND_SIZE = 18;
 
 @Component({
   selector: 'app-hand-score',
@@ -30,12 +32,18 @@ export class HandScore {
     return counts;
   });
 
+  private isValidHandSize = computed<boolean>(() => {
+    const tiles = this.tableStore.entities()[0].tiles;
+    return tiles.length >= MIN_HAND_SIZE && tiles.length <= MAX_HAND_SIZE;
+  });
+
   allChi = computed<number>(() => {
     const baseScore = 1;
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== 14) {
+    // All-chi requires exactly 14 tiles (no kongs allowed)
+    if (!this.isValidHandSize() || tiles.length !== MIN_HAND_SIZE) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -66,7 +74,7 @@ export class HandScore {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== 14) {
+    if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -105,7 +113,7 @@ export class HandScore {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== 14) {
+    if (!this.isValidHandSize()) {
       return 0;
     }
 
@@ -198,7 +206,7 @@ export class HandScore {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== 14) {
+    if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -278,7 +286,16 @@ export class HandScore {
     for (let s = startSuite; s <= endSuite; s++) {
       for (let n = 1; n <= 9; n++) {
         if (c[s][n] > 0) {
-          // Try pung/kong (remove 3)
+          // Try kong (remove 4)
+          if (c[s][n] >= 4) {
+            c[s][n] -= 4;
+            if (this.canFormMelds(c, suitIndex)) {
+              return true;
+            }
+            c[s][n] += 4;
+          }
+
+          // Try pung (remove 3)
           if (c[s][n] >= 3) {
             c[s][n] -= 3;
             if (this.canFormMelds(c, suitIndex)) {
@@ -311,6 +328,17 @@ export class HandScore {
     for (let s = 0; s < SUITE_COUNT; s++) {
       for (let n = 0; n <= 9; n++) {
         if (counts[s][n] > 0) {
+          // Try kong (remove 4)
+          if (counts[s][n] >= 4) {
+            counts[s][n] -= 4;
+            const result = this.canFormAllPungs(counts);
+            counts[s][n] += 4;
+            if (result) {
+              return true;
+            }
+          }
+
+          // Try pung (remove 3)
           if (counts[s][n] >= 3) {
             counts[s][n] -= 3;
             const result = this.canFormAllPungs(counts);
@@ -319,6 +347,7 @@ export class HandScore {
               return true;
             }
           }
+
           return false;
         }
       }

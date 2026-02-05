@@ -10,6 +10,7 @@ import { TableStore } from '../../store/table-store';
 const DEFAULT_NO_SCORE = 0;
 const SPECIAL_HAND_SCORE = 15;
 const REQUIRED_TILES = 14;
+const MAX_TILES_WITH_KONGS = 18;
 const SUITE_COUNT = 3;
 
 @Component({
@@ -35,6 +36,11 @@ export class SpecialHands {
         counts[st.suite][st.number]++;
       });
     return counts;
+  });
+
+  private isValidHandSize = computed<boolean>(() => {
+    const tiles = this.tableStore.entities()[0].tiles;
+    return tiles.length >= REQUIRED_TILES && tiles.length <= MAX_TILES_WITH_KONGS;
   });
 
   // Special Hand 1: 13 Orphans
@@ -142,7 +148,7 @@ export class SpecialHands {
     const tiles = currentPlayer.tiles;
     const exposedTiles = currentPlayer.exposedTiles;
 
-    if (tiles.length !== REQUIRED_TILES || exposedTiles.length !== 0) {
+    if (!this.isValidHandSize() || exposedTiles.length !== 0) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -179,7 +185,7 @@ export class SpecialHands {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== REQUIRED_TILES) {
+    if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -191,7 +197,7 @@ export class SpecialHands {
       windCounts.get(WindType.NORTH) ?? 0,
     ];
 
-    // Need 3 pungs (count >= 3) and 1 pair (count === 2)
+    // Need 3 pungs/kongs (count >= 3) and 1 pair (count === 2)
     const pungCount = windCountValues.filter((c) => c >= 3).length;
     const pairCount = windCountValues.filter((c) => c === 2).length;
 
@@ -199,15 +205,15 @@ export class SpecialHands {
       return DEFAULT_NO_SCORE;
     }
 
-    // Remaining tiles (should be 3 tiles) must form 1 meld
+    // Remaining tiles must form 1 meld (3 for pung/chi, 4 for kong)
     const windTileCount = windCountValues.reduce((sum, c) => sum + c, 0);
-    const remainingTileCount = REQUIRED_TILES - windTileCount;
+    const remainingTileCount = tiles.length - windTileCount;
 
-    if (remainingTileCount !== 3) {
+    if (remainingTileCount < 3 || remainingTileCount > 4) {
       return DEFAULT_NO_SCORE;
     }
 
-    // Check if remaining tiles can form a meld (chi or pung)
+    // Check if remaining tiles can form a meld (chi, pung, or kong)
     const nonWindTiles = tiles.filter((t) => {
       if (t.type !== TileType.HONOUR) return true;
       const ht = t as HonourTile;
@@ -226,13 +232,13 @@ export class SpecialHands {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== REQUIRED_TILES) {
+    if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
     }
 
     const windCounts = this.countWinds(tiles);
 
-    // All 4 winds must have count >= 3 (pungs)
+    // All 4 winds must have count >= 3 (pungs/kongs)
     const hasAllWindPungs =
       (windCounts.get(WindType.EAST) ?? 0) >= 3 &&
       (windCounts.get(WindType.SOUTH) ?? 0) >= 3 &&
@@ -249,7 +255,7 @@ export class SpecialHands {
       0,
     );
 
-    if (REQUIRED_TILES - windTileCount !== 2) {
+    if (tiles.length - windTileCount !== 2) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -276,13 +282,13 @@ export class SpecialHands {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== REQUIRED_TILES) {
+    if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
     }
 
     const dragonCounts = this.countDragons(tiles);
 
-    // All 3 dragons must have count >= 3 (pungs)
+    // All 3 dragons must have count >= 3 (pungs/kongs)
     const hasAllDragonPungs =
       (dragonCounts.get(DragonType.RED) ?? 0) >= 3 &&
       (dragonCounts.get(DragonType.GREEN) ?? 0) >= 3 &&
@@ -292,13 +298,14 @@ export class SpecialHands {
       return DEFAULT_NO_SCORE;
     }
 
-    // Remaining 5 tiles must form 1 meld + 1 pair
+    // Remaining tiles must form 1 meld + 1 pair (5 tiles for pung/chi, 6 for kong)
     const dragonTileCount = Array.from(dragonCounts.values()).reduce(
       (sum, c) => sum + c,
       0,
     );
 
-    if (REQUIRED_TILES - dragonTileCount !== 5) {
+    const remainingTileCount = tiles.length - dragonTileCount;
+    if (remainingTileCount < 5 || remainingTileCount > 6) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -310,20 +317,18 @@ export class SpecialHands {
     });
 
     // Try each possible pair
-    if (nonDragonTiles.length === 5) {
-      for (let i = 0; i < nonDragonTiles.length; i++) {
-        for (let j = i + 1; j < nonDragonTiles.length; j++) {
-          const key1 = this.getTileKey(nonDragonTiles[i]);
-          const key2 = this.getTileKey(nonDragonTiles[j]);
+    for (let i = 0; i < nonDragonTiles.length; i++) {
+      for (let j = i + 1; j < nonDragonTiles.length; j++) {
+        const key1 = this.getTileKey(nonDragonTiles[i]);
+        const key2 = this.getTileKey(nonDragonTiles[j]);
 
-          if (key1 === key2) {
-            // Found a pair, check if remaining 3 form a meld
-            const remaining = nonDragonTiles.filter(
-              (_, idx) => idx !== i && idx !== j,
-            );
-            if (this.canFormSingleMeld(remaining)) {
-              return SPECIAL_HAND_SCORE;
-            }
+        if (key1 === key2) {
+          // Found a pair, check if remaining tiles form a meld (3 for pung/chi, 4 for kong)
+          const remaining = nonDragonTiles.filter(
+            (_, idx) => idx !== i && idx !== j,
+          );
+          if (this.canFormSingleMeld(remaining)) {
+            return SPECIAL_HAND_SCORE;
           }
         }
       }
@@ -337,7 +342,7 @@ export class SpecialHands {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== REQUIRED_TILES) {
+    if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -375,7 +380,7 @@ export class SpecialHands {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== REQUIRED_TILES) {
+    if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
     }
 
@@ -398,10 +403,10 @@ export class SpecialHands {
         const tempCount = new Map(tileCount);
         tempCount.set(key, count - 2);
 
-        // Check if remaining tiles form 4 pungs
+        // Check if remaining tiles form 4 pungs/kongs (each count must be 0, 3, or 4)
         let canFormPungs = true;
         for (const [_, c] of tempCount.entries()) {
-          if (c > 0 && c < 3) {
+          if (c === 1 || c === 2) {
             canFormPungs = false;
             break;
           }
@@ -554,6 +559,17 @@ export class SpecialHands {
     for (let s = 0; s < SUITE_COUNT; s++) {
       for (let n = 0; n <= 9; n++) {
         if (counts[s][n] > 0) {
+          // Try kong (remove 4)
+          if (counts[s][n] >= 4) {
+            counts[s][n] -= 4;
+            const result = this.canFormAllPungs(counts);
+            counts[s][n] += 4;
+            if (result) {
+              return true;
+            }
+          }
+
+          // Try pung (remove 3)
           if (counts[s][n] >= 3) {
             counts[s][n] -= 3;
             const result = this.canFormAllPungs(counts);
@@ -562,6 +578,7 @@ export class SpecialHands {
               return true;
             }
           }
+
           return false;
         }
       }
@@ -570,6 +587,12 @@ export class SpecialHands {
   }
 
   private canFormSingleMeld(tiles: Tile[]): boolean {
+    // Check for kong (4 of the same)
+    if (tiles.length === 4) {
+      const key = this.getTileKey(tiles[0]);
+      return tiles.every((t) => this.getTileKey(t) === key);
+    }
+
     if (tiles.length !== 3) {
       return false;
     }
@@ -613,7 +636,7 @@ export class SpecialHands {
     const currentPlayer = this.tableStore.entities()[0];
     const tiles = currentPlayer.tiles;
 
-    if (tiles.length !== REQUIRED_TILES) {
+    if (!this.isValidHandSize()) {
       return false;
     }
 

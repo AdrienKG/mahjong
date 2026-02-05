@@ -934,5 +934,315 @@ describe('HandScore', () => {
         expect(component.allChi()).toBe(1);
       });
     });
+
+    describe('All-Chi Rejects Kong Hands', () => {
+      it('should score 0 for 15-tile hand (Kong not valid for all-chi)', () => {
+        const tiles = [
+          // Chi 1: 1-2-3 Bamboo
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          // Chi 2: 4-5-6 Bamboo
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          // Chi 3: 4-5-6 Bamboo
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          // Chi 4: 7-8-9 Bamboo
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          // Pair (eyes): 2-2 Bamboo
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          // Extra tile to make 15
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.allChi()).toBe(0);
+      });
+    });
+  });
+
+  describe('allPung computed signal - Kong Support', () => {
+
+    describe('Valid All-Pung Hands with Kongs', () => {
+
+      it('should score 2 for all-pung hand with one Kong (15 tiles)', () => {
+        const tiles = [
+          // Kong: 4x Bamboo-1
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          // Pung: 3x Bamboo-3
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          // Pung: 3x Bamboo-5
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          // Pung: 3x Bamboo-7
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          // Pair: 2x Bamboo-9
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.allPung()).toBe(2);
+      });
+
+      it('should score 2 for all-pung hand with two Kongs (16 tiles)', () => {
+        const tiles = [
+          // Kong: 4x Bamboo-1
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          // Kong: 4x Bamboo-3
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          // Pung: 3x Bamboo-5
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          // Pung: 3x Bamboo-7
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          // Pair: 2x Bamboo-9
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.allPung()).toBe(2);
+      });
+
+      it('should score 2 for all-pung hand with four Kongs (18 tiles)', () => {
+        const tiles = [
+          // Kong: 4x Bamboo-1
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          // Kong: 4x Bamboo-3
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          // Kong: 4x Bamboo-5
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          // Kong: 4x Bamboo-7
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          // Pair: 2x Bamboo-9
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.allPung()).toBe(2);
+      });
+
+      it('should score 5 (2+3 bonus) for all-pung even-number hand with Kong', () => {
+        const tiles = [
+          // Kong: 4x Bamboo-2
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          // Pung: 3x Bamboo-4
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          // Pung: 3x Bamboo-6
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          // Pung: 3x Dots-8
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          // Pair: 2x Dots-2
+          createSuitedTile(SuitedTileType.DOTS, 2),
+          createSuitedTile(SuitedTileType.DOTS, 2),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.allPung()).toBe(5);
+      });
+
+      it('should score 0 for 15 tiles that cannot form valid melds', () => {
+        const tiles = [
+          // Random tiles that don't form proper melds
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.DOTS, 1),
+          createSuitedTile(SuitedTileType.DOTS, 2),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 4),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.allPung()).toBe(0);
+      });
+    });
+  });
+
+  describe('mixedTwoSuit computed signal - Kong Support', () => {
+
+    it('should score 1 for mixed two suit hand with one Kong (15 tiles)', () => {
+      const tiles = [
+        // Kong: 4x Bamboo-1
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        // Chi: 2-3-4 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        // Chi: 5-6-7 Character
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        createSuitedTile(SuitedTileType.CHARACTER, 6),
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        // Chi: 7-8-9 Character
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        createSuitedTile(SuitedTileType.CHARACTER, 8),
+        createSuitedTile(SuitedTileType.CHARACTER, 9),
+        // Pair: 2x Character-1
+        createSuitedTile(SuitedTileType.CHARACTER, 1),
+        createSuitedTile(SuitedTileType.CHARACTER, 1),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.mixedTwoSuit()).toBe(1);
+    });
+  });
+
+  describe('purityHand computed signal - Kong Support', () => {
+
+    it('should score 9 for purity hand with one Kong (15 tiles)', () => {
+      const tiles = [
+        // Kong: 4x Bamboo-1
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        // Chi: 2-3-4 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        // Chi: 5-6-7 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        // Chi: 7-8-9 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 8),
+        createSuitedTile(SuitedTileType.BAMBOO, 9),
+        // Pair: 2x Bamboo-5
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.purityHand()).toBe(9);
+    });
+
+    it('should score 9 for purity hand with all Kongs (18 tiles)', () => {
+      const tiles = [
+        // Kong: 4x Bamboo-1
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        // Kong: 4x Bamboo-3
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        // Kong: 4x Bamboo-5
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        // Kong: 4x Bamboo-7
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        // Pair: 2x Bamboo-9
+        createSuitedTile(SuitedTileType.BAMBOO, 9),
+        createSuitedTile(SuitedTileType.BAMBOO, 9),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.purityHand()).toBe(9);
+    });
+  });
+
+  describe('littleSevenPairs and bigSevenPairs - Reject Kong Hands', () => {
+
+    it('littleSevenPairs should score 0 for 15 tiles', () => {
+      const tiles = [
+        // 7 pairs + 1 extra
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 8),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.littleSevenPairs()).toBe(0);
+    });
+
+    it('bigSevenPairs should score 0 for 15 tiles', () => {
+      const tiles = [
+        // 7 pairs consecutive + 1 extra
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 8),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.bigSevenPairs()).toBe(0);
+    });
   });
 });
