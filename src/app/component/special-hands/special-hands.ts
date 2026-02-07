@@ -40,7 +40,9 @@ export class SpecialHands {
 
   private isValidHandSize = computed<boolean>(() => {
     const tiles = this.tableStore.entities()[0].tiles;
-    return tiles.length >= REQUIRED_TILES && tiles.length <= MAX_TILES_WITH_KONGS;
+    return (
+      tiles.length >= REQUIRED_TILES && tiles.length <= MAX_TILES_WITH_KONGS
+    );
   });
 
   // Special Hand 1: 13 Orphans
@@ -80,12 +82,24 @@ export class SpecialHands {
       (t) => t.type === TileType.SUITED,
     ) as SuitedTile[];
     const hasAllTerminals =
-      suitedTiles.some((t) => t.suite === SuitedTileType.BAMBOO && t.number === 1) &&
-      suitedTiles.some((t) => t.suite === SuitedTileType.BAMBOO && t.number === 9) &&
-      suitedTiles.some((t) => t.suite === SuitedTileType.CHARACTER && t.number === 1) &&
-      suitedTiles.some((t) => t.suite === SuitedTileType.CHARACTER && t.number === 9) &&
-      suitedTiles.some((t) => t.suite === SuitedTileType.DOTS && t.number === 1) &&
-      suitedTiles.some((t) => t.suite === SuitedTileType.DOTS && t.number === 9);
+      suitedTiles.some(
+        (t) => t.suite === SuitedTileType.BAMBOO && t.number === 1,
+      ) &&
+      suitedTiles.some(
+        (t) => t.suite === SuitedTileType.BAMBOO && t.number === 9,
+      ) &&
+      suitedTiles.some(
+        (t) => t.suite === SuitedTileType.CHARACTER && t.number === 1,
+      ) &&
+      suitedTiles.some(
+        (t) => t.suite === SuitedTileType.CHARACTER && t.number === 9,
+      ) &&
+      suitedTiles.some(
+        (t) => t.suite === SuitedTileType.DOTS && t.number === 1,
+      ) &&
+      suitedTiles.some(
+        (t) => t.suite === SuitedTileType.DOTS && t.number === 9,
+      );
 
     if (!hasAllWinds || !hasAllDragons || !hasAllTerminals) {
       return DEFAULT_NO_SCORE;
@@ -614,14 +628,9 @@ export class SpecialHands {
     if (suitedTiles.length === 3) {
       // All suited, check if same suit and consecutive
       const suite = suitedTiles[0].suite;
-      if (
-        suitedTiles.every((t) => t.suite === suite)
-      ) {
+      if (suitedTiles.every((t) => t.suite === suite)) {
         const numbers = suitedTiles.map((t) => t.number).sort((a, b) => a - b);
-        if (
-          numbers[1] === numbers[0] + 1 &&
-          numbers[2] === numbers[1] + 1
-        ) {
+        if (numbers[1] === numbers[0] + 1 && numbers[2] === numbers[1] + 1) {
           return true; // Chi
         }
       }
@@ -651,7 +660,10 @@ export class SpecialHands {
       tileCount.set(key, (tileCount.get(key) ?? 0) + 1);
     });
 
-    if (tileCount.size === 7 && Array.from(tileCount.values()).every((c) => c === 2)) {
+    if (
+      tileCount.size === 7 &&
+      Array.from(tileCount.values()).every((c) => c === 2)
+    ) {
       return true;
     }
 

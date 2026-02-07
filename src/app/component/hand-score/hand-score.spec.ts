@@ -7,7 +7,11 @@ import { TileType } from '../../model/tile-type';
 import { HonourTile, HonourTileType } from '../../model/honour-tile';
 import { WindType } from '../../model/wind-type';
 import { DragonType } from '../../model/dragon-type';
-import { BonusTile, BonusTileColor, BonusTileType } from '../../model/bonus-tile';
+import {
+  BonusTile,
+  BonusTileColor,
+  BonusTileType,
+} from '../../model/bonus-tile';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('HandScore', () => {
@@ -81,11 +85,9 @@ describe('HandScore', () => {
   }
 
   describe('allChi computed signal - Comprehensive Tests', () => {
-
     // ============ VALID ALL-CHI HANDS ============
 
     describe('Valid All-Chi Hands', () => {
-
       it('should score 1 for simple all-chi hand in single suit (Bamboo)', () => {
         const tiles = [
           // Chi 1: 1-2-3 Bamboo
@@ -350,7 +352,6 @@ describe('HandScore', () => {
     // ============ INVALID HANDS - TILE COUNT ============
 
     describe('Invalid Hands - Tile Count', () => {
-
       it('should score 0 for hand with 0 tiles', () => {
         setPlayerTiles([]);
         expect(component.allChi()).toBe(0);
@@ -415,7 +416,9 @@ describe('HandScore', () => {
       });
 
       it('should score 0 for hand with 20 tiles', () => {
-        const tiles = Array(20).fill(null).map(() => createSuitedTile(SuitedTileType.BAMBOO, 1));
+        const tiles = Array(20)
+          .fill(null)
+          .map(() => createSuitedTile(SuitedTileType.BAMBOO, 1));
         setPlayerTiles(tiles);
         expect(component.allChi()).toBe(0);
       });
@@ -424,7 +427,6 @@ describe('HandScore', () => {
     // ============ INVALID HANDS - NON-SUITED TILES ============
 
     describe('Invalid Hands - Non-Suited Tiles', () => {
-
       it('should score 0 for hand with wind tiles', () => {
         const tiles = [
           createSuitedTile(SuitedTileType.BAMBOO, 1),
@@ -534,7 +536,6 @@ describe('HandScore', () => {
     // ============ INVALID HANDS - CANNOT FORM CHIS ============
 
     describe('Invalid Hands - Cannot Form All Chis', () => {
-
       it('should score 0 for all-pung hand (3-3-3, 4-4-4, 5-5-5, 6-6-6, pair 7-7)', () => {
         const tiles = [
           // Pung 1: 3-3-3
@@ -721,7 +722,6 @@ describe('HandScore', () => {
     // ============ EDGE CASES ============
 
     describe('Edge Cases', () => {
-
       it('should score 0 for completely empty hand', () => {
         setPlayerTiles([]);
         expect(component.allChi()).toBe(0);
@@ -849,7 +849,6 @@ describe('HandScore', () => {
     // ============ SPECIAL PATTERNS ============
 
     describe('Special Patterns', () => {
-
       it('should score 1 for all-chi with only low numbers (1-5)', () => {
         const tiles = [
           createSuitedTile(SuitedTileType.BAMBOO, 1),
@@ -967,9 +966,7 @@ describe('HandScore', () => {
   });
 
   describe('allPung computed signal - Kong Support', () => {
-
     describe('Valid All-Pung Hands with Kongs', () => {
-
       it('should score 2 for all-pung hand with one Kong (15 tiles)', () => {
         const tiles = [
           // Kong: 4x Bamboo-1
@@ -1108,7 +1105,6 @@ describe('HandScore', () => {
   });
 
   describe('mixedTwoSuit computed signal - Kong Support', () => {
-
     it('should score 1 for mixed two suit hand with one Kong (15 tiles)', () => {
       const tiles = [
         // Kong: 4x Bamboo-1
@@ -1138,7 +1134,6 @@ describe('HandScore', () => {
   });
 
   describe('purityHand computed signal - Kong Support', () => {
-
     it('should score 9 for purity hand with one Kong (15 tiles)', () => {
       const tiles = [
         // Kong: 4x Bamboo-1
@@ -1197,8 +1192,812 @@ describe('HandScore', () => {
     });
   });
 
-  describe('littleSevenPairs and bigSevenPairs - Reject Kong Hands', () => {
+  describe('bigSevenPairs computed signal - Comprehensive Tests', () => {
+    // ============ VALID BIG SEVEN PAIRS HANDS ============
 
+    describe('Valid Big Seven Pairs Hands', () => {
+      it('should score 9 for 1-7 consecutive pairs in Bamboo', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 1-7 consecutive pairs in Character', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.CHARACTER, 1),
+          createSuitedTile(SuitedTileType.CHARACTER, 1),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 1-7 consecutive pairs in Dots', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.DOTS, 1),
+          createSuitedTile(SuitedTileType.DOTS, 1),
+          createSuitedTile(SuitedTileType.DOTS, 2),
+          createSuitedTile(SuitedTileType.DOTS, 2),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 4),
+          createSuitedTile(SuitedTileType.DOTS, 4),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.DOTS, 6),
+          createSuitedTile(SuitedTileType.DOTS, 6),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 2-8 consecutive pairs in Bamboo', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 2-8 consecutive pairs in Character', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 8),
+          createSuitedTile(SuitedTileType.CHARACTER, 8),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 3-9 consecutive pairs in Bamboo', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 3-9 consecutive pairs in Dots', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 4),
+          createSuitedTile(SuitedTileType.DOTS, 4),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.DOTS, 6),
+          createSuitedTile(SuitedTileType.DOTS, 6),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 9),
+          createSuitedTile(SuitedTileType.DOTS, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 1-7 with pairs spread across different suits', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.DOTS, 6),
+          createSuitedTile(SuitedTileType.DOTS, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 2-8 with pairs in two suits', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 8),
+          createSuitedTile(SuitedTileType.CHARACTER, 8),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 9 for 3-9 with all three suits used', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 9),
+          createSuitedTile(SuitedTileType.DOTS, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+    });
+
+    // ============ INVALID HANDS - TILE COUNT ============
+
+    describe('Invalid Hands - Tile Count', () => {
+      it('should score 0 for empty hand', () => {
+        setPlayerTiles([]);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 13 tiles (one short of a pair)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 15 tiles', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 12 tiles (6 pairs)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 16 tiles (8 pairs)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+    });
+
+    // ============ INVALID HANDS - NON-SUITED TILES ============
+
+    describe('Invalid Hands - Non-Suited Tiles', () => {
+      it('should score 0 when hand contains wind tiles', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createWindTile(WindType.EAST),
+          createWindTile(WindType.EAST),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 when hand contains dragon tiles', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createDragonTile(DragonType.RED),
+          createDragonTile(DragonType.RED),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 when hand contains bonus tiles', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createBonusTile(),
+          createBonusTile(),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 when even a single honour tile is present', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createWindTile(WindType.NORTH),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+    });
+
+    // ============ INVALID HANDS - NOT CONSECUTIVE ============
+
+    describe('Invalid Hands - Not Consecutive Pairs', () => {
+      it('should score 0 for 7 pairs with a gap (1,2,3,4,5,6,8 - missing 7)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 7 pairs with a gap (2,3,4,5,6,8,9 - missing 7)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 8),
+          createSuitedTile(SuitedTileType.CHARACTER, 8),
+          createSuitedTile(SuitedTileType.CHARACTER, 9),
+          createSuitedTile(SuitedTileType.CHARACTER, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 7 pairs spanning 1-9 with gaps (1,2,3,5,7,8,9)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.DOTS, 1),
+          createSuitedTile(SuitedTileType.DOTS, 1),
+          createSuitedTile(SuitedTileType.DOTS, 2),
+          createSuitedTile(SuitedTileType.DOTS, 2),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 3),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+          createSuitedTile(SuitedTileType.DOTS, 7),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 9),
+          createSuitedTile(SuitedTileType.DOTS, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 7 pairs of all odd numbers (1,3,5,7,9 only 5 unique)', () => {
+        // Only 5 unique odd numbers exist, so need duplicates which won't be pairs of 7 different numbers
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.CHARACTER, 1),
+          createSuitedTile(SuitedTileType.CHARACTER, 1),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for 7 pairs of even numbers (2,4,6,8 only 4 unique)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for consecutive 1-6 pairs plus non-consecutive pair 9', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+    });
+
+    // ============ INVALID HANDS - PAIR SPLIT ACROSS SUITS ============
+
+    describe('Invalid Hands - Pair Split Across Suits', () => {
+      it('should score 0 when a pair is split across two suits (1 in each)', () => {
+        // Number 7 has 1 Bamboo + 1 Character = 2 tiles total, but no single suite has >= 2
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 when multiple pairs are split across suits', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.CHARACTER, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.CHARACTER, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.CHARACTER, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+    });
+
+    // ============ INVALID HANDS - NOT PAIRS ============
+
+    describe('Invalid Hands - Not Pairs', () => {
+      it('should score 0 for hand with melds instead of pairs (chi + pung pattern)', () => {
+        const tiles = [
+          // This is 4 chis + pair, not 7 pairs
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for all-pung hand in consecutive range', () => {
+        // 3-3-3, 4-4-4, 5-5-5, 6-6 = only 11 tiles. Need 14.
+        // Let's try: 1-1-1, 2-2-2, 3-3-3, 4-4-4, 5-5 = 14 tiles
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+        ];
+        setPlayerTiles(tiles);
+        // Has pairs for 1-5, but not 6 or 7. Only 5 numbers covered, not 7 consecutive.
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+    });
+
+    // ============ EDGE CASES ============
+
+    describe('Edge Cases', () => {
+      it('should also trigger littleSevenPairs (both hands can score simultaneously)', () => {
+        // A valid 1-7 big seven pairs hand is also a valid little seven pairs hand
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+        expect(component.littleSevenPairs()).toBe(6);
+      });
+
+      it('should score 9 even when tiles are not in sorted order', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+
+      it('should score 0 for littleSevenPairs that is NOT consecutive', () => {
+        // Valid littleSevenPairs but not bigSevenPairs (not consecutive)
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.littleSevenPairs()).toBe(6);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 when all 14 tiles are the same number (not 7 pairs of different numbers)', () => {
+        // 14 tiles of bamboo-5 - but mahjong only has 4 copies of each tile
+        // Still, the code should handle it: counts[BAMBOO][5] = 14, passes pair check for number 5
+        // But would fail for numbers 1-4 or 6-7 etc. since they have 0 tiles
+        // Actually this is impossible in a real game but testing the logic
+        const tiles = Array(14)
+          .fill(null)
+          .map(() => createSuitedTile(SuitedTileType.BAMBOO, 5));
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should only accept the three valid ranges (1-7, 2-8, 3-9)', () => {
+        // Verify 4-10 would not work (numbers only go to 9)
+        // Test a hand that's consecutive but starts at 4: 4,5,6,7,8,9 = only 6 numbers
+        // Need 7 pairs so add a non-consecutive pair
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+        ];
+        setPlayerTiles(tiles);
+        // 4-9 is only 6 consecutive, and 1 is not adjacent. No valid range matches.
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 9 when all pairs are in different suits for 3-9', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.DOTS, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+          createSuitedTile(SuitedTileType.CHARACTER, 7),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.DOTS, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(9);
+      });
+    });
+
+    // ============ BOUNDARY OF VALID RANGES ============
+
+    describe('Boundary of Valid Ranges', () => {
+      it('should score 0 for pairs 1-6 only (one short of 1-7)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 2),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 3),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          // 12 tiles - would need 2 more but not number 7
+          createSuitedTile(SuitedTileType.BAMBOO, 1),
+          createSuitedTile(SuitedTileType.CHARACTER, 1),
+        ];
+        setPlayerTiles(tiles);
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+
+      it('should score 0 for pairs 4-9 only (6 consecutive, not 7)', () => {
+        const tiles = [
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 4),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 5),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 6),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 7),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 8),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.BAMBOO, 9),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+          createSuitedTile(SuitedTileType.CHARACTER, 4),
+        ];
+        setPlayerTiles(tiles);
+        // 4-9 is 6 consecutive. Second pair of 4s doesn't extend the range.
+        // Range 1-7: no 1,2,3. Fail.
+        // Range 2-8: no 2,3. Fail.
+        // Range 3-9: no 3. Fail.
+        expect(component.bigSevenPairs()).toBe(0);
+      });
+    });
+  });
+
+  describe('littleSevenPairs and bigSevenPairs - Reject Kong Hands', () => {
     it('littleSevenPairs should score 0 for 15 tiles', () => {
       const tiles = [
         // 7 pairs + 1 extra

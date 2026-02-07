@@ -260,7 +260,7 @@ export class HandScore {
       this.purityHand() > 0
     );
   }
-  
+
   private canFormChis(c: number[][]): boolean {
     for (let s = 0; s < SUITE_COUNT; s++) {
       for (let n = 1; n <= 9; n++) {

@@ -1,5 +1,7 @@
 <div>
-  <div [class.hasHandScore]="allChi() > 0"><b>All Chi Hand</b>: 4 Chis + pair of Eyes, no Winds or Dragons</div>
+  <div [class.hasHandScore]="allChi() > 0">
+    <b>All Chi Hand</b>: 4 Chis + pair of Eyes, no Winds or Dragons
+  </div>
   <div [class.hasHandScore]="mixedTwoSuit() > 0">
     <b>Mixed Two Suit Hand</b>: 4 melds + pair of Eyes, only two suits, no Winds
     or Dragons
@@ -21,5 +23,4 @@
     Dragons.
   </div>
 </div>
-<span>Total Points: {{ totalPoints() }}
-</span>
+<span>Total Points: {{ totalPoints() }} </span>

@@ -10,7 +10,7 @@
   "runArgs": ["--network=host"],
   "customizations": {
     "vscode": {
-      "extensions": ["angular.ng-template"]
+      "extensions": ["angular.ng-template", "Anthropic.claude-code"]
     }
   },
   "forwardPorts": [4200]

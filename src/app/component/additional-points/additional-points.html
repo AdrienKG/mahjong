@@ -9,12 +9,8 @@
   <div [class.hasPoints]="pungOfTableOrOwnWind() > 0">
     <b>Pung of Table Wind or Own Wind</b>: 1 point
   </div>
-  <div [class.hasPoints]="selfTouch() > 0">
-    <b>Self Touch</b>: 1 point
-  </div>
-  <div [class.hasPoints]="singleCall() > 0">
-    <b>Single Call</b>: 1 point
-  </div>
+  <div [class.hasPoints]="selfTouch() > 0"><b>Self Touch</b>: 1 point</div>
+  <div [class.hasPoints]="singleCall() > 0"><b>Single Call</b>: 1 point</div>
   <div [class.hasPoints]="deadWallDraw() > 0">
     <b>Winning tile from dead wall</b>: 1 point
   </div>
@@ -37,11 +33,10 @@
     <b>Two Suit Dragon (1-9 using two suits)</b>: 1 point
   </div>
   <div [class.hasPoints]="littleFlower() > 0">
-    <b>Little Flower (2 identical consecutive chis, different suits)</b>: 1 point
+    <b>Little Flower (2 identical consecutive chis, different suits)</b>: 1
+    point
   </div>
-  <div [class.hasPoints]="ownFlower() > 0">
-    <b>Own Flower</b>: 1 point
-  </div>
+  <div [class.hasPoints]="ownFlower() > 0"><b>Own Flower</b>: 1 point</div>
 
   <!-- 2-POINT RULES -->
   <div [class.hasPoints]="bouquetGarden() > 0">

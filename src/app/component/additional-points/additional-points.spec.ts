@@ -8,9 +8,8 @@ describe('AdditionalPoints', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdditionalPoints]
-    })
-    .compileComponents();
+      imports: [AdditionalPoints],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AdditionalPoints);
     component = fixture.componentInstance;

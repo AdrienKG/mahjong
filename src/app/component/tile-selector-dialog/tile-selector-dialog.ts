@@ -17,12 +17,7 @@ interface TileCategory {
 
 @Component({
   selector: 'app-tile-chooser-dialog',
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatDialogModule,
-    TileDisplayPipe,
-  ],
+  imports: [CommonModule, MatButtonModule, MatDialogModule, TileDisplayPipe],
   templateUrl: './tile-selector-dialog.html',
   styleUrl: './tile-selector-dialog.scss',
 })
@@ -31,32 +26,60 @@ export class TileSelectorDialog {
   public tileDisplayPipe = inject(TileDisplayPipe);
   public selectedTileId = signal<string>('');
 
-  public bambooTiles = computed(() =>{
-    return this.createTileMapByDisplay(t => t.type === TileType.SUITED && (t as SuitedTile).suite === SuitedTileType.BAMBOO);
+  public bambooTiles = computed(() => {
+    return this.createTileMapByDisplay(
+      (t) =>
+        t.type === TileType.SUITED &&
+        (t as SuitedTile).suite === SuitedTileType.BAMBOO,
+    );
   });
 
-  public characterTiles = computed(() =>{
-    return this.createTileMapByDisplay(t => t.type === TileType.SUITED && (t as SuitedTile).suite === SuitedTileType.CHARACTER);
+  public characterTiles = computed(() => {
+    return this.createTileMapByDisplay(
+      (t) =>
+        t.type === TileType.SUITED &&
+        (t as SuitedTile).suite === SuitedTileType.CHARACTER,
+    );
   });
 
-  public dotTiles = computed(() =>{
-    return this.createTileMapByDisplay(t => t.type === TileType.SUITED && (t as SuitedTile).suite === SuitedTileType.DOTS);
+  public dotTiles = computed(() => {
+    return this.createTileMapByDisplay(
+      (t) =>
+        t.type === TileType.SUITED &&
+        (t as SuitedTile).suite === SuitedTileType.DOTS,
+    );
   });
 
-  public windTiles = computed(() =>{
-    return this.createTileMapByDisplay(t => t.type === TileType.HONOUR && (t as HonourTile).honour === HonourTileType.WIND);
+  public windTiles = computed(() => {
+    return this.createTileMapByDisplay(
+      (t) =>
+        t.type === TileType.HONOUR &&
+        (t as HonourTile).honour === HonourTileType.WIND,
+    );
   });
 
-  public dragonTiles = computed(() =>{
-    return this.createTileMapByDisplay(t => t.type === TileType.HONOUR && (t as HonourTile).honour === HonourTileType.DRAGON);
+  public dragonTiles = computed(() => {
+    return this.createTileMapByDisplay(
+      (t) =>
+        t.type === TileType.HONOUR &&
+        (t as HonourTile).honour === HonourTileType.DRAGON,
+    );
   });
 
   public flowerTiles = computed(() => {
-    return this.createTileMapByDisplay(t => t.type === TileType.BONUS && (t as BonusTile).bonus === BonusTileType.FLOWER);
+    return this.createTileMapByDisplay(
+      (t) =>
+        t.type === TileType.BONUS &&
+        (t as BonusTile).bonus === BonusTileType.FLOWER,
+    );
   });
 
   public seasonTiles = computed(() => {
-    return this.createTileMapByDisplay(t => t.type === TileType.BONUS && (t as BonusTile).bonus === BonusTileType.SEASON);
+    return this.createTileMapByDisplay(
+      (t) =>
+        t.type === TileType.BONUS &&
+        (t as BonusTile).bonus === BonusTileType.SEASON,
+    );
   });
 
   public tileSets = computed(() => {
@@ -71,11 +94,13 @@ export class TileSelectorDialog {
     ];
   });
 
-  private createTileMapByDisplay(predicate: (tile: Tile) => boolean): Map<string, Tile[]> {
+  private createTileMapByDisplay(
+    predicate: (tile: Tile) => boolean,
+  ): Map<string, Tile[]> {
     const typedTiles = this.store.tiles().filter(predicate);
     const tileMap = new Map<string, Tile[]>();
 
-    typedTiles.forEach(tile => {
+    typedTiles.forEach((tile) => {
       const displayKey = this.tileDisplayPipe.transform(tile);
       if (!tileMap.has(displayKey)) {
         tileMap.set(displayKey, []);

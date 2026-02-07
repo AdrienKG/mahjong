@@ -1,18 +1,18 @@
 <h2 mat-dialog-title>Choose a tile</h2>
 <mat-dialog-content>
-  @for(sets of tileSets(); track sets.tiles.values()) {
-    <div>
-      {{ sets.name }} Tiles
-      </div>
-      <div class="tiles-container">
-        @for (tile of sets.tiles.values(); track tile) {
-          <button
-            [matButton]="selectedTileId() === tile[0].id ? 'filled' : 'tonal'"
-            class="tile-button"
-            (click)="selectedTileId.set(tile[0].id)"
-            >{{ tile[0] | tileDisplay }}</button>
-        }
-      </div>
+  @for (sets of tileSets(); track sets.tiles.values()) {
+    <div>{{ sets.name }} Tiles</div>
+    <div class="tiles-container">
+      @for (tile of sets.tiles.values(); track tile) {
+        <button
+          [matButton]="selectedTileId() === tile[0].id ? 'filled' : 'tonal'"
+          class="tile-button"
+          (click)="selectedTileId.set(tile[0].id)"
+        >
+          {{ tile[0] | tileDisplay }}
+        </button>
+      }
+    </div>
   }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
