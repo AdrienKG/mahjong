@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { BonusTile, BonusTileColor, BonusTileType } from '../model/bonus-tile';
 import { DragonType } from '../model/dragon-type';
 import { HonourTile, HonourTileType } from '../model/honour-tile';
-import { Player, SelectedChi } from '../model/player';
+import { MeldType, Player, SelectedMeld } from '../model/player';
 import { PlayerSeat } from '../model/player-seat';
 import { SuitedTile, SuitedTileType } from '../model/suited-tile';
 import { Tile } from '../model/tile';
@@ -150,7 +150,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
-            selectedChis: [],
+            selectedMelds: [],
           },
           {
             id: PlayerSeat.right,
@@ -164,7 +164,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
-            selectedChis: [],
+            selectedMelds: [],
           },
           {
             id: PlayerSeat.across,
@@ -178,7 +178,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
-            selectedChis: [],
+            selectedMelds: [],
           },
           {
             id: PlayerSeat.left,
@@ -192,7 +192,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
-            selectedChis: [],
+            selectedMelds: [],
           },
         ] as Player[]),
       );
@@ -372,18 +372,26 @@ export const TableStore = signalStore(
         );
       }
     },
-    selectChi(
+    selectMeld(
       playerId: PlayerSeat,
-      chiInfo: { suite: SuitedTileType; startNumber: number; tileIds: string[] },
+      meldInfo: {
+        meldType: MeldType;
+        tileIds: string[];
+        tileKey?: string;
+        suite?: SuitedTileType;
+        startNumber?: number;
+      },
     ) {
       const player = store.entities().find((p) => p.id === playerId);
       if (!player) return;
 
-      const selectedChi = {
+      const selectedMeld: SelectedMeld = {
         id: uuidv4(),
-        suite: chiInfo.suite,
-        startNumber: chiInfo.startNumber,
-        tileIds: chiInfo.tileIds,
+        meldType: meldInfo.meldType,
+        tileIds: meldInfo.tileIds,
+        tileKey: meldInfo.tileKey,
+        suite: meldInfo.suite,
+        startNumber: meldInfo.startNumber,
       };
 
       patchState(
@@ -391,28 +399,74 @@ export const TableStore = signalStore(
         updateEntity({
           id: playerId,
           changes: {
-            selectedChis: [...(player.selectedChis || []), selectedChi],
+            selectedMelds: [...(player.selectedMelds || []), selectedMeld],
           },
         }),
       );
     },
-    deselectChi(playerId: PlayerSeat, chiId: string) {
+    deselectMeld(playerId: PlayerSeat, meldId: string) {
       const player = store.entities().find((p) => p.id === playerId);
       if (!player) return;
 
-      const filtered = (player.selectedChis || []).filter(
-        (chi) => chi.id !== chiId,
+      const filtered = (player.selectedMelds || []).filter(
+        (m) => m.id !== meldId,
       );
 
       patchState(
         store,
         updateEntity({
           id: playerId,
-          changes: { selectedChis: filtered },
+          changes: { selectedMelds: filtered },
         }),
       );
     },
-    clearSelectedChis(playerId: PlayerSeat) {
+    upgradeMeld(playerId: PlayerSeat, meldId: string, newTileId: string) {
+      const player = store.entities().find((p) => p.id === playerId);
+      if (!player) return;
+
+      const melds = (player.selectedMelds || []).map((m) => {
+        if (m.id === meldId && m.meldType === 'pung') {
+          return {
+            ...m,
+            meldType: 'kong' as MeldType,
+            tileIds: [...m.tileIds, newTileId],
+          };
+        }
+        return m;
+      });
+
+      patchState(
+        store,
+        updateEntity({
+          id: playerId,
+          changes: { selectedMelds: melds },
+        }),
+      );
+    },
+    downgradeMeld(playerId: PlayerSeat, meldId: string) {
+      const player = store.entities().find((p) => p.id === playerId);
+      if (!player) return;
+
+      const melds = (player.selectedMelds || []).map((m) => {
+        if (m.id === meldId && m.meldType === 'kong') {
+          return {
+            ...m,
+            meldType: 'pung' as MeldType,
+            tileIds: m.tileIds.slice(0, 3), // drop last tile
+          };
+        }
+        return m;
+      });
+
+      patchState(
+        store,
+        updateEntity({
+          id: playerId,
+          changes: { selectedMelds: melds },
+        }),
+      );
+    },
+    clearSelectedMelds(playerId: PlayerSeat) {
       const player = store.entities().find((p) => p.id === playerId);
       if (!player) return;
 
@@ -420,7 +474,7 @@ export const TableStore = signalStore(
         store,
         updateEntity({
           id: playerId,
-          changes: { selectedChis: [] },
+          changes: { selectedMelds: [] },
         }),
       );
     },

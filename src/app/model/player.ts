@@ -2,11 +2,15 @@ import { Tile } from './tile';
 import { WindType } from './wind-type';
 import { SuitedTileType } from './suited-tile';
 
-export interface SelectedChi {
-  id: string; // UUID for unique identity
-  suite: SuitedTileType;
-  startNumber: number; // 1-7
-  tileIds: string[]; // IDs of the 3 tiles in this CHI
+export type MeldType = 'chi' | 'pung' | 'kong';
+
+export interface SelectedMeld {
+  id: string;
+  meldType: MeldType;
+  tileIds: string[];
+  tileKey?: string; // getTileKey() value for pung/kong identity
+  suite?: SuitedTileType; // for CHIs only
+  startNumber?: number; // for CHIs only
 }
 
 export interface Player {
@@ -15,5 +19,5 @@ export interface Player {
   tiles: Tile[];
   exposedTiles: Tile[];
   bonusTiles: Tile[];
-  selectedChis?: SelectedChi[];
+  selectedMelds?: SelectedMeld[];
 }

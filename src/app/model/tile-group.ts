@@ -1,7 +1,10 @@
 import { Tile } from './tile';
+import { MeldType } from './player';
 
 export interface TileGroup {
   tiles: Tile[];
-  isSelectedChi: boolean;
-  chiId?: string; // If isSelectedChi, the ID of the selected CHI
+  isSelectedMeld: boolean;
+  meldId?: string;
+  meldType?: MeldType;
+  canDismiss?: boolean; // false when any tile is exposed
 }

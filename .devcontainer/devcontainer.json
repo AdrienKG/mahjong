@@ -13,5 +13,6 @@
       "extensions": ["angular.ng-template", "Anthropic.claude-code"]
     }
   },
-  "forwardPorts": [4200]
+  "forwardPorts": [4200],
+  "postCreateCommand": "curl -fsSL https://claude.ai/install.sh | bash"
 }

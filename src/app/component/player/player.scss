@@ -10,26 +10,38 @@
     padding: 0.15rem 0.35rem;
   }
 
-  .chi-group {
+  .meld-group {
     display: flex;
     position: relative;
-    border: 0.2rem solid red;
+    border: 0.2rem solid #ccc;
     border-radius: 0.5rem;
     padding: 0.2rem;
     margin: 0 0.1rem;
     gap: 0.1rem;
+
+    &.chi-group {
+      border-color: red;
+    }
+
+    &.pung-group {
+      border-color: green;
+    }
+
+    &.kong-group {
+      border-color: blue;
+    }
   }
 
-  .dismiss-chi-btn {
+  .dismiss-meld-btn {
     position: absolute;
     top: -0.5rem;
     right: -0.5rem;
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 50%;
-    border: 0.1rem solid red;
+    border: 0.1rem solid #999;
     background: white;
-    color: red;
+    color: #999;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
@@ -42,7 +54,7 @@
     z-index: 10;
 
     &:hover {
-      background: red;
+      background: #999;
       color: white;
       transform: scale(1.1);
     }

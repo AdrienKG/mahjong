@@ -4,17 +4,27 @@
   "configurations": [
     {
       "name": "ng serve",
-      "type": "chrome",
+      "type": "node",
       "request": "launch",
-      "preLaunchTask": "npm: start",
-      "url": "http://localhost:4200/"
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "serverReadyAction": {
+        "pattern": "localhost:(\\d+)",
+        "uriFormat": "http://localhost:%s",
+        "action": "openExternally"
+      }
     },
     {
       "name": "ng test",
-      "type": "chrome",
+      "type": "node",
       "request": "launch",
-      "preLaunchTask": "npm: test",
-      "url": "http://localhost:9876/debug.html"
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["test"],
+      "serverReadyAction": {
+        "pattern": "localhost:(\\d+)",
+        "uriFormat": "http://localhost:%s/debug.html",
+        "action": "openExternally"
+      }
     }
   ]
 }

@@ -1,25 +1,32 @@
 <div class="wind-label">{{ player().wind | windTypeDisplay }}</div>
 @for (group of groupedHand(); track $index) {
-  @if (group.isSelectedChi) {
-    <div class="chi-group">
+  @if (group.isSelectedMeld) {
+    <div
+      class="meld-group"
+      [class.chi-group]="group.meldType === 'chi'"
+      [class.pung-group]="group.meldType === 'pung'"
+      [class.kong-group]="group.meldType === 'kong'"
+    >
       @for (tile of group.tiles; track tile.id) {
         <app-tile
           [playerId]="playerSeat()"
           [tile]="tile"
-          (mouseenter)="onTileHover(tile)"
+          (mouseenter)="onTileHover(tile, $event)"
           (mouseleave)="onTileHoverEnd()"
         ></app-tile>
       }
-      <button class="dismiss-chi-btn" (click)="onChiDismiss(group.chiId!)">
-        ×
-      </button>
+      @if (group.canDismiss) {
+        <button class="dismiss-meld-btn" (click)="onMeldDismiss(group.meldId!)">
+          ×
+        </button>
+      }
     </div>
   } @else {
     @for (tile of group.tiles; track tile.id) {
       <app-tile
         [playerId]="playerSeat()"
         [tile]="tile"
-        (mouseenter)="onTileHover(tile)"
+        (mouseenter)="onTileHover(tile, $event)"
         (mouseleave)="onTileHoverEnd()"
       ></app-tile>
     }
@@ -28,9 +35,16 @@
 <app-chi-overlay
   [hoveredTile]="hoveredTile()"
   [availableTiles]="currentHand()"
-  [selectedChis]="player().selectedChis || []"
+  [selectedMelds]="player().selectedMelds || []"
+  [hoveredMeld]="hoveredMeld()"
   [playerId]="playerSeat()"
-  (chiSelected)="onChiSelected($event)"
+  [overlayLeft]="overlayLeft()"
+  [tileTop]="overlayTop()"
+  [tileBottom]="overlayBottom()"
+  [showAbove]="showAbove()"
+  (meldSelected)="onMeldSelected($event)"
+  (meldUpgrade)="onMeldUpgrade($event)"
+  (meldDowngrade)="onMeldDowngrade($event)"
   (overlayEnter)="onOverlayMouseEnter()"
   (overlayLeave)="onOverlayMouseLeave()"
 ></app-chi-overlay>

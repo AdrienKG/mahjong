@@ -1,10 +1,17 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
-import { SelectedChi } from '../../model/player';
+import {
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { SelectedMeld } from '../../model/player';
 import { PlayerSeat } from '../../model/player-seat';
 import { TileGroup } from '../../model/tile-group';
 import { WindTypeDisplayPipe } from '../../pipe/wind-type-display-pipe';
 import { TableStore } from '../../store/table-store';
-import { ChiOverlay } from '../chi-overlay/chi-overlay';
+import { ChiOverlay, MeldTransition } from '../chi-overlay/chi-overlay';
 import { Tile } from '../tile/tile';
 
 @Component({
@@ -28,35 +35,42 @@ export class Player {
   });
 
   hoveredTile = signal<any>(null);
+  hoveredMeld = signal<SelectedMeld | null>(null);
+  overlayLeft = signal<number>(0);
+  overlayTop = signal<number>(0);
+  overlayBottom = signal<number>(0);
+  showAbove = signal(false);
   private hideTimeout: ReturnType<typeof setTimeout> | null = null;
 
   groupedHand = computed(() => {
     const allTiles = this.currentHand();
-    const selectedChis = this.player().selectedChis || [];
+    const player = this.player();
+    const selectedMelds = player.selectedMelds || [];
+    const exposedTileIds = new Set(player.exposedTiles.map((t) => t.id));
     const groups: TileGroup[] = [];
 
-    // Track which tiles are used in selected CHIs
     const usedTileIds = new Set<string>();
 
-    // Create groups for selected CHIs
-    selectedChis.forEach((chi) => {
-      const chiTiles = allTiles.filter((t) => chi.tileIds.includes(t.id));
-      if (chiTiles.length === 3) {
+    selectedMelds.forEach((meld) => {
+      const meldTiles = allTiles.filter((t) => meld.tileIds.includes(t.id));
+      if (meldTiles.length === meld.tileIds.length) {
+        const hasExposedTile = meldTiles.some((t) => exposedTileIds.has(t.id));
         groups.push({
-          tiles: chiTiles,
-          isSelectedChi: true,
-          chiId: chi.id,
+          tiles: meldTiles,
+          isSelectedMeld: true,
+          meldId: meld.id,
+          meldType: meld.meldType,
+          canDismiss: !hasExposedTile,
         });
-        chiTiles.forEach((t) => usedTileIds.add(t.id));
+        meldTiles.forEach((t) => usedTileIds.add(t.id));
       }
     });
 
-    // Add remaining tiles as individual groups
     allTiles.forEach((tile) => {
       if (!usedTileIds.has(tile.id)) {
         groups.push({
           tiles: [tile],
-          isSelectedChi: false,
+          isSelectedMeld: false,
         });
       }
     });
@@ -64,14 +78,41 @@ export class Player {
     return groups;
   });
 
-  onTileHover(tile: any) {
+  private hostEl = inject(ElementRef);
+
+  onTileHover(tile: any, event: MouseEvent) {
     this.clearHideTimeout();
-    this.hoveredTile.set(tile);
+
+    const tileEl = (event.target as HTMLElement).closest('app-tile');
+    if (tileEl) {
+      const hostRect = this.hostEl.nativeElement.getBoundingClientRect();
+      const tileRect = tileEl.getBoundingClientRect();
+      this.overlayLeft.set(tileRect.left - hostRect.left);
+      this.overlayTop.set(tileRect.top - hostRect.top);
+      this.overlayBottom.set(tileRect.bottom - hostRect.top);
+      const spaceBelow = window.innerHeight - tileRect.bottom;
+      this.showAbove.set(spaceBelow < 150);
+    }
+
+    const selectedMelds = this.player().selectedMelds || [];
+    const meld = selectedMelds.find((m) => m.tileIds.includes(tile.id));
+
+    if (meld) {
+      if (meld.meldType === 'chi') {
+        return; // No overlay for CHI groups
+      }
+      this.hoveredTile.set(tile);
+      this.hoveredMeld.set(meld);
+    } else {
+      this.hoveredTile.set(tile);
+      this.hoveredMeld.set(null);
+    }
   }
 
   onTileHoverEnd() {
     this.hideTimeout = setTimeout(() => {
       this.hoveredTile.set(null);
+      this.hoveredMeld.set(null);
       this.hideTimeout = null;
     }, 300);
   }
@@ -83,6 +124,7 @@ export class Player {
   onOverlayMouseLeave() {
     this.hideTimeout = setTimeout(() => {
       this.hoveredTile.set(null);
+      this.hoveredMeld.set(null);
       this.hideTimeout = null;
     }, 300);
   }
@@ -94,16 +136,37 @@ export class Player {
     }
   }
 
-  onChiSelected(chi: SelectedChi) {
-    this.tableStore.selectChi(this.playerSeat(), {
-      suite: chi.suite,
-      startNumber: chi.startNumber,
-      tileIds: chi.tileIds,
+  onMeldSelected(meld: SelectedMeld) {
+    this.tableStore.selectMeld(this.playerSeat(), {
+      meldType: meld.meldType,
+      tileIds: meld.tileIds,
+      tileKey: meld.tileKey,
+      suite: meld.suite,
+      startNumber: meld.startNumber,
     });
-    this.hoveredTile.set(null); // Close overlay after selection
+    this.hoveredTile.set(null);
+    this.hoveredMeld.set(null);
   }
 
-  onChiDismiss(chiId: string) {
-    this.tableStore.deselectChi(this.playerSeat(), chiId);
+  onMeldUpgrade(transition: MeldTransition) {
+    if (transition.newTileId) {
+      this.tableStore.upgradeMeld(
+        this.playerSeat(),
+        transition.meldId,
+        transition.newTileId,
+      );
+    }
+    this.hoveredTile.set(null);
+    this.hoveredMeld.set(null);
+  }
+
+  onMeldDowngrade(transition: MeldTransition) {
+    this.tableStore.downgradeMeld(this.playerSeat(), transition.meldId);
+    this.hoveredTile.set(null);
+    this.hoveredMeld.set(null);
+  }
+
+  onMeldDismiss(meldId: string) {
+    this.tableStore.deselectMeld(this.playerSeat(), meldId);
   }
 }
