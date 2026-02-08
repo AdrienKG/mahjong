@@ -1,0 +1,18 @@
+@if (hoveredTile()) {
+  <div class="chi-overlay" (mouseenter)="overlayEnter.emit()" (mouseleave)="overlayLeave.emit()">
+    @if (possibleChis().length > 0) {
+      <div class="chi-overlay-title">Possible CHIs:</div>
+      @for (chi of possibleChis(); track $index) {
+        <div class="chi-option" (click)="onSelectChi(chi)">
+          @for (tile of chi.tiles; track tile.id) {
+            <span class="chi-tile">{{ tile | tileDisplay }}</span>
+          }
+        </div>
+      }
+    } @else {
+      <div class="chi-overlay-title">
+        Hovering: {{ hoveredTile()! | tileDisplay }} (no CHIs available)
+      </div>
+    }
+  </div>
+}

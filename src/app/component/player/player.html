@@ -1,4 +1,36 @@
 <div class="wind-label">{{ player().wind | windTypeDisplay }}</div>
-@for (tile of currentHand() | sortTiles; track tile.id) {
-  <app-tile [playerId]="playerSeat()" [tile]="tile"></app-tile>
+@for (group of groupedHand(); track $index) {
+  @if (group.isSelectedChi) {
+    <div class="chi-group">
+      @for (tile of group.tiles; track tile.id) {
+        <app-tile
+          [playerId]="playerSeat()"
+          [tile]="tile"
+          (mouseenter)="onTileHover(tile)"
+          (mouseleave)="onTileHoverEnd()"
+        ></app-tile>
+      }
+      <button class="dismiss-chi-btn" (click)="onChiDismiss(group.chiId!)">
+        ×
+      </button>
+    </div>
+  } @else {
+    @for (tile of group.tiles; track tile.id) {
+      <app-tile
+        [playerId]="playerSeat()"
+        [tile]="tile"
+        (mouseenter)="onTileHover(tile)"
+        (mouseleave)="onTileHoverEnd()"
+      ></app-tile>
+    }
+  }
 }
+<app-chi-overlay
+  [hoveredTile]="hoveredTile()"
+  [availableTiles]="currentHand()"
+  [selectedChis]="player().selectedChis || []"
+  [playerId]="playerSeat()"
+  (chiSelected)="onChiSelected($event)"
+  (overlayEnter)="onOverlayMouseEnter()"
+  (overlayLeave)="onOverlayMouseLeave()"
+></app-chi-overlay>

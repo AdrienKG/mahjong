@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { BonusTile, BonusTileColor, BonusTileType } from '../model/bonus-tile';
 import { DragonType } from '../model/dragon-type';
 import { HonourTile, HonourTileType } from '../model/honour-tile';
-import { Player } from '../model/player';
+import { Player, SelectedChi } from '../model/player';
 import { PlayerSeat } from '../model/player-seat';
 import { SuitedTile, SuitedTileType } from '../model/suited-tile';
 import { Tile } from '../model/tile';
@@ -150,6 +150,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
+            selectedChis: [],
           },
           {
             id: PlayerSeat.right,
@@ -163,6 +164,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
+            selectedChis: [],
           },
           {
             id: PlayerSeat.across,
@@ -176,6 +178,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
+            selectedChis: [],
           },
           {
             id: PlayerSeat.left,
@@ -189,6 +192,7 @@ export const TableStore = signalStore(
             ),
             exposedTiles: [],
             bonusTiles: [],
+            selectedChis: [],
           },
         ] as Player[]),
       );
@@ -367,6 +371,58 @@ export const TableStore = signalStore(
           }),
         );
       }
+    },
+    selectChi(
+      playerId: PlayerSeat,
+      chiInfo: { suite: SuitedTileType; startNumber: number; tileIds: string[] },
+    ) {
+      const player = store.entities().find((p) => p.id === playerId);
+      if (!player) return;
+
+      const selectedChi = {
+        id: uuidv4(),
+        suite: chiInfo.suite,
+        startNumber: chiInfo.startNumber,
+        tileIds: chiInfo.tileIds,
+      };
+
+      patchState(
+        store,
+        updateEntity({
+          id: playerId,
+          changes: {
+            selectedChis: [...(player.selectedChis || []), selectedChi],
+          },
+        }),
+      );
+    },
+    deselectChi(playerId: PlayerSeat, chiId: string) {
+      const player = store.entities().find((p) => p.id === playerId);
+      if (!player) return;
+
+      const filtered = (player.selectedChis || []).filter(
+        (chi) => chi.id !== chiId,
+      );
+
+      patchState(
+        store,
+        updateEntity({
+          id: playerId,
+          changes: { selectedChis: filtered },
+        }),
+      );
+    },
+    clearSelectedChis(playerId: PlayerSeat) {
+      const player = store.entities().find((p) => p.id === playerId);
+      if (!player) return;
+
+      patchState(
+        store,
+        updateEntity({
+          id: playerId,
+          changes: { selectedChis: [] },
+        }),
+      );
     },
   })),
   // Hands

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(npm test:*)",
+      "Bash(ls:*)",
+      "Bash(npx ng build:*)",
+      "Bash(npx ng test:*)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}

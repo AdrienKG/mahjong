@@ -1,3 +1,8 @@
+/**
+ * DEPRECATED: This pipe is currently disabled in favor of manual CHI grouping logic.
+ * The file is retained for potential future use.
+ */
+
 import { Pipe, PipeTransform } from '@angular/core';
 import { BonusTile, BonusTileColor, BonusTileType } from '../model/bonus-tile';
 import { DragonType } from '../model/dragon-type';
