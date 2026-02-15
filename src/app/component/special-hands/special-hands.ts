@@ -1,4 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
+import {
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
 import { SuitedTile, SuitedTileType } from '../../model/suited-tile';
 import { HonourTile, HonourTileType } from '../../model/honour-tile';
 import { TileType } from '../../model/tile-type';
@@ -15,7 +20,7 @@ const SUITE_COUNT = 3;
 
 @Component({
   selector: 'app-special-hands',
-  imports: [],
+  imports: [MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
   templateUrl: './special-hands.html',
   styleUrl: './special-hands.scss',
 })

@@ -1,4 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
+import {
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
 import { SuitedTile } from '../../model/suited-tile';
 import { TileType } from '../../model/tile-type';
 import { TableStore } from '../../store/table-store';
@@ -10,7 +15,7 @@ const MAX_HAND_SIZE = 18;
 
 @Component({
   selector: 'app-hand-score',
-  imports: [],
+  imports: [MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
   templateUrl: './hand-score.html',
   styleUrl: './hand-score.scss',
 })

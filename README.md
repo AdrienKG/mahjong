@@ -1,59 +1,49 @@
-# Mahjong
+# Mahjong Scoring Calculator
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.4.
+A client-side Mahjong scoring calculator that tracks player hands, detects valid winning patterns, and calculates points. Built with Angular as a single-page application with no backend.
 
-## Development server
+## Frameworks & Technologies
 
-To start a local development server, run:
+- **Angular 21** - Standalone components, signals, zoneless change detection
+- **@ngrx/signals** - State management via a single `signalStore`
+- **Angular Material** - UI components with a cyan-orange theme
+- **TypeScript 5.9** - Strict mode enabled
+- **SCSS** - Styling
+- **Karma + Jasmine** - Unit testing
 
-```bash
-ng serve
-```
+## How It Works
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Game State
 
-## Code scaffolding
+A single signal store manages the entire game table: 4 players (each with hand tiles, exposed tiles, and bonus tiles), the table wind, a discard pile, and a 144-tile wall. Player 0 is always the "current player" whose hand is scored.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Tile System
 
-```bash
-ng generate component component-name
-```
+Tiles use a discriminated union model with three types:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- **Suited tiles** - Bamboo, Character, and Dots, numbered 1-9
+- **Honour tiles** - Winds and Dragons
+- **Bonus tiles** - Flowers and Seasons
 
-```bash
-ng generate --help
-```
+Each tile has a unique ID for tracking and a semantic key (e.g. `"SUITED-BAMBOO-3"`) for value comparison.
 
-## Building
+### Scoring
 
-To build the project run:
+Scoring is split into three categories:
 
-```bash
-ng build
-```
+- **Standard hands** - Detected using backtracking on a `counts[3][10]` array (suite x number). Includes all-chi, mixed-two-suit, all-pung, seven pairs, and purity hands, worth 1-9 points.
+- **Special hands** - 15-point hands evaluated as mutually exclusive (first match wins). Includes thirteen orphans, heaven's/earth's hand, all-hidden-pung-kong, four winds, three big dragons, all-terminal, all-honours, and nine connected sons.
+- **Additional points** - Bonus points for eyes, kongs, flowers, wind/dragon pungs, and terminal pungs.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### UI
 
-## Running unit tests
+The interface displays the game table with player hands, an odds panel aggregating all scoring components, and dialogs for selecting specific tiles or changing the table wind. Players can pick up tiles, discard, expose melds (chi, pung, kong), and randomize hands.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+## Development
 
 ```bash
-ng e2e
+npm start       # Dev server at http://localhost:4200
+npm test        # Unit tests
+npm run build   # Production build
+npm run format  # Prettier formatting
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

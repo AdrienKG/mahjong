@@ -1,4 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
+import {
+  MatExpansionPanel,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
 import { BonusTile, BonusTileType } from '../../model/bonus-tile';
 import { DragonType } from '../../model/dragon-type';
 import { HonourTile, HonourTileType } from '../../model/honour-tile';
@@ -25,7 +30,7 @@ interface Pung {
 
 @Component({
   selector: 'app-additional-points',
-  imports: [],
+  imports: [MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
   templateUrl: './additional-points.html',
   styleUrl: './additional-points.scss',
 })
