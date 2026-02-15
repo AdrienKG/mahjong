@@ -4,7 +4,9 @@ import {
   MatExpansionPanelHeader,
   MatExpansionPanelTitle,
 } from '@angular/material/expansion';
+import { HonourTile } from '../../model/honour-tile';
 import { SuitedTile } from '../../model/suited-tile';
+import { Tile } from '../../model/tile';
 import { TileType } from '../../model/tile-type';
 import { TableStore } from '../../store/table-store';
 
@@ -360,14 +362,16 @@ export class HandScore {
     return true;
   }
 
-  private getTileKey(tile: any): string {
+  private getTileKey(tile: Tile): string {
     const type = tile.type;
-    const suite = tile.suite ?? 'none';
-    const number = tile.number ?? 'none';
-    const windType = tile.windType ?? 'none';
-    const dragonType = tile.dragonType ?? 'none';
-
-    return `${type}-${suite}-${number}-${windType}-${dragonType}`;
+    if (type === TileType.SUITED) {
+      const st = tile as SuitedTile;
+      return `${type}-${st.suite}-${st.number}`;
+    } else if (type === TileType.HONOUR) {
+      const ht = tile as HonourTile;
+      return `${type}-${ht.honour}-${ht.value}`;
+    }
+    return `${type}`;
   }
 
   private hasPairsInSequence(startNum: number, endNum: number): boolean {
