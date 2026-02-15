@@ -1,27 +1,30 @@
 :host {
   height: 100%;
   width: 100%;
+
+  display: grid;
+  grid-template-rows: 1fr;
 }
 
 app-odds-panel {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
   overflow-y: auto;
 }
 
 @media screen and (min-width: 600px) {
   :host {
-    display: grid;
+    overflow: hidden;
 
-    grid-template-areas: "table odds";
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  :host {
+    grid-template-rows: 1fr auto;
   }
 
-  app-odds-panel {
-    grid-area: odds;
-
-    position: unset;
+  app-table {
+    position: sticky;
+    top: 0;
   }
 }

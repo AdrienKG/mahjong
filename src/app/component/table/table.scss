@@ -1,5 +1,5 @@
 :host {
-  border: 0.25rem solid green;
+  // outline: 0.25rem solid green;
 
   display: flex;
   flex-direction: column;
@@ -15,7 +15,8 @@
 }
 
 .row {
-  border: 0.15rem solid rgba(0, 0, 0, 0.1);
+  // outline: 0.15rem solid rgba(0, 0, 0, 0.1);
+
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -24,18 +25,18 @@
   flex: 1 1 0%;
 }
 
-.row.north {
-  border-color: yellow;
-}
-.row.west {
-  border-color: red;
-}
-.row.south {
-  border-color: purple;
-}
-.row.east {
-  border-color: blue;
-}
+// .row.north {
+//   outline-color: yellow;
+// }
+// .row.west {
+//   outline-color: red;
+// }
+// .row.south {
+//   outline-color: purple;
+// }
+// .row.east {
+//   outline-color: blue;
+// }
 
 .controls.extra {
   display: flex;

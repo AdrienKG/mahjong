@@ -7,6 +7,8 @@
 
 .tile {
   position: relative;
+  border: 0.0625rem solid black;
+
   &:hover {
     border: 0.125rem blue solid;
   }
