@@ -27,14 +27,19 @@ const SUITE_COUNT = 3;
 export class SpecialHands {
   private tableStore = inject(TableStore);
 
+  /** Hand tiles excluding bonus tiles (flowers/seasons) */
+  private handTiles = computed<Tile[]>(() => {
+    return this.tableStore
+      .entities()[0]
+      .tiles.filter((t) => t.type !== TileType.BONUS);
+  });
+
   // Computed signal for suited tile counts (reused from hand-score pattern)
   private counts = computed<number[][]>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
     const counts: number[][] = Array.from({ length: SUITE_COUNT }, () =>
       Array(10).fill(0),
     );
-    tiles
+    this.handTiles()
       .filter((t) => t.type === TileType.SUITED)
       .forEach((t) => {
         const st = t as SuitedTile;
@@ -44,7 +49,7 @@ export class SpecialHands {
   });
 
   private isValidHandSize = computed<boolean>(() => {
-    const tiles = this.tableStore.entities()[0].tiles;
+    const tiles = this.handTiles();
     return (
       tiles.length >= REQUIRED_TILES && tiles.length <= MAX_TILES_WITH_KONGS
     );
@@ -52,8 +57,7 @@ export class SpecialHands {
 
   // Special Hand 1: 13 Orphans
   thirteenOrphans = computed<number>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (tiles.length !== REQUIRED_TILES) {
       return DEFAULT_NO_SCORE;
@@ -164,7 +168,7 @@ export class SpecialHands {
   // Special Hand 4: All Hidden Pung/Kong Hand
   allHiddenPungKong = computed<number>(() => {
     const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
     const exposedTiles = currentPlayer.exposedTiles;
 
     if (!this.isValidHandSize() || exposedTiles.length !== 0) {
@@ -201,8 +205,7 @@ export class SpecialHands {
 
   // Special Hand 5: 4 Small Winds
   fourSmallWinds = computed<number>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
@@ -248,8 +251,7 @@ export class SpecialHands {
 
   // Special Hand 6: 4 Big Winds
   fourBigWinds = computed<number>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
@@ -298,8 +300,7 @@ export class SpecialHands {
 
   // Special Hand 7: 3 Big Dragons
   threeBigDragons = computed<number>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
@@ -358,8 +359,7 @@ export class SpecialHands {
 
   // Special Hand 8: All Terminal Hand
   allTerminalHand = computed<number>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
@@ -396,8 +396,7 @@ export class SpecialHands {
 
   // Special Hand 9: All Honours Hand
   allHonoursHand = computed<number>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
@@ -442,8 +441,7 @@ export class SpecialHands {
 
   // Special Hand 10: 9 Connected Sons
   nineConnectedSons = computed<number>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (tiles.length !== REQUIRED_TILES) {
       return DEFAULT_NO_SCORE;
@@ -647,8 +645,7 @@ export class SpecialHands {
   private hasValidWinningHand(): boolean {
     // Simplified check: any hand with valid structure could be a winning hand
     // This checks if tiles can form 4 melds + 1 pair
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return false;

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { BonusTile, BonusTileType } from '../../model/bonus-tile';
@@ -24,7 +24,6 @@ interface TileCategory {
 export class TileSelectorDialog {
   public store = inject(TableStore);
   public tileDisplayPipe = inject(TileDisplayPipe);
-  public selectedTileId = signal<string>('');
 
   public bambooTiles = computed(() => {
     return this.createTileMapByDisplay(

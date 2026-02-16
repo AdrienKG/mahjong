@@ -1,6 +1,6 @@
 <mat-expansion-panel>
   <mat-expansion-panel-header>
-    <mat-panel-title>Hands</mat-panel-title>
+    <mat-panel-title>Hands ({{ totalPoints() }})</mat-panel-title>
   </mat-expansion-panel-header>
   <div>
     <div [class.hasHandScore]="allChi() > 0">
@@ -9,6 +9,9 @@
     <div [class.hasHandScore]="mixedTwoSuit() > 0">
       <b>Mixed Two Suit Hand</b>: 4 melds + pair of Eyes, only two suits, no
       Winds or Dragons
+    </div>
+    <div [class.hasHandScore]="mixedHand() > 0">
+      <b>Mixed Hand</b>: One Suit only of Chis or Pungs with Winds or Dragons
     </div>
     <div [class.hasHandScore]="allPung() > 0">
       <b>All Pung Hand</b>: Mixed Suits, may include Winds and Dragons.

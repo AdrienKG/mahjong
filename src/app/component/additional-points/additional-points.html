@@ -1,6 +1,6 @@
 <mat-expansion-panel>
   <mat-expansion-panel-header>
-    <mat-panel-title>Additional Points</mat-panel-title>
+    <mat-panel-title>Additional Points ({{ totalPoints() }})</mat-panel-title>
   </mat-expansion-panel-header>
   <div>
     <!-- 1-POINT RULES -->
@@ -41,6 +41,7 @@
       point
     </div>
     <div [class.hasPoints]="ownFlower() > 0"><b>Own Flower</b>: 1 point</div>
+    <div [class.hasPoints]="ownSeason() > 0"><b>Own Season</b>: 1 point</div>
 
     <!-- 2-POINT RULES -->
     <div [class.hasPoints]="bouquetGarden() > 0">

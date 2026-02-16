@@ -24,14 +24,19 @@ const MAX_HAND_SIZE = 18;
 export class HandScore {
   private tableStore = inject(TableStore);
 
-  private counts = computed<number[][]>(() => {
-    const currentPlayer = this.tableStore.entities()[0];
+  /** Hand tiles excluding bonus tiles (flowers/seasons) */
+  private handTiles = computed<Tile[]>(() => {
+    return this.tableStore
+      .entities()[0]
+      .tiles.filter((t) => t.type !== TileType.BONUS);
+  });
 
-    const tiles = currentPlayer.tiles;
+  private counts = computed<number[][]>(() => {
     const counts: number[][] = Array.from({ length: SUITE_COUNT }, () =>
       Array(10).fill(0),
     );
-    tiles.forEach((t) => {
+    this.handTiles().forEach((t) => {
+      if (t.type !== TileType.SUITED) return;
       const st = t as SuitedTile;
       counts[st.suite][st.number]++;
     });
@@ -40,14 +45,13 @@ export class HandScore {
   });
 
   private isValidHandSize = computed<boolean>(() => {
-    const tiles = this.tableStore.entities()[0].tiles;
+    const tiles = this.handTiles();
     return tiles.length >= MIN_HAND_SIZE && tiles.length <= MAX_HAND_SIZE;
   });
 
   allChi = computed<number>(() => {
     const baseScore = 1;
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     // All-chi requires exactly 14 tiles (no kongs allowed)
     if (!this.isValidHandSize() || tiles.length !== MIN_HAND_SIZE) {
@@ -78,8 +82,7 @@ export class HandScore {
 
   mixedTwoSuit = computed<number>(() => {
     const baseScore = 1;
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
@@ -114,39 +117,79 @@ export class HandScore {
     return DEFAULT_NO_SCORE;
   });
 
-  allPung = computed<number>(() => {
+  mixedHand = computed<number>(() => {
     const baseScore = 2;
-    const bonusScore = 3;
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
-      return 0;
+      return DEFAULT_NO_SCORE;
     }
 
-    // Try every possible pair (eyes)
-    for (let s = 0; s < SUITE_COUNT; s++) {
-      for (let n = 0; n <= 9; n++) {
-        if (this.counts()[s][n] >= 2) {
-          const clone = this.counts().map((arr) => arr.slice());
-          clone[s][n] -= 2; // remove pair
-          if (this.canFormAllPungs(clone)) {
-            // Valid all pung hand found
-            // Check for even/odd bonus
-            const suitedTiles = tiles.filter(
-              (t) => t.type === TileType.SUITED,
-            ) as SuitedTile[];
+    const suitedTiles = tiles.filter(
+      (t) => t.type === TileType.SUITED,
+    ) as SuitedTile[];
+    const honourTiles = tiles.filter(
+      (t) => t.type === TileType.HONOUR,
+    ) as HonourTile[];
 
-            if (suitedTiles.length > 0) {
-              const allNumbers = suitedTiles.map((t) => t.number);
-              const allEven = allNumbers.every((n) => n % 2 === 0);
-              const allOdd = allNumbers.every((n) => n % 2 === 1);
+    // Must have both suited and honour tiles, no other types
+    if (
+      suitedTiles.length === 0 ||
+      honourTiles.length === 0 ||
+      tiles.length !== suitedTiles.length + honourTiles.length
+    ) {
+      return DEFAULT_NO_SCORE;
+    }
 
-              if (allEven || allOdd) {
-                return baseScore + bonusScore;
-              }
-            }
+    // Suited tiles must be from exactly one suit
+    const suitsUsed = new Set(suitedTiles.map((t) => t.suite));
+    if (suitsUsed.size !== 1) {
+      return DEFAULT_NO_SCORE;
+    }
 
+    const suitIndex = Array.from(suitsUsed)[0];
+
+    const buildSuitedCounts = (): number[][] => {
+      const c: number[][] = Array.from({ length: SUITE_COUNT }, () =>
+        Array(10).fill(0),
+      );
+      suitedTiles.forEach((t) => c[t.suite][t.number]++);
+      return c;
+    };
+
+    // Count honour tiles by identity
+    const honourGroups = new Map<string, number>();
+    honourTiles.forEach((t) => {
+      const key = `${t.honour}-${t.value}`;
+      honourGroups.set(key, (honourGroups.get(key) ?? 0) + 1);
+    });
+
+    const honoursFormMelds = (groups: Map<string, number>): boolean => {
+      for (const count of groups.values()) {
+        if (count !== 0 && count !== 3 && count !== 4) return false;
+      }
+      return true;
+    };
+
+    // Try pair from suited tiles
+    for (let n = 1; n <= 9; n++) {
+      const c = buildSuitedCounts();
+      if (c[suitIndex][n] >= 2) {
+        c[suitIndex][n] -= 2;
+        if (this.canFormMelds(c, suitIndex) && honoursFormMelds(honourGroups)) {
+          return baseScore;
+        }
+      }
+    }
+
+    // Try pair from honour tiles
+    for (const [key, count] of honourGroups) {
+      if (count >= 2) {
+        const clone = new Map(honourGroups);
+        clone.set(key, count - 2);
+        if (honoursFormMelds(clone)) {
+          const c = buildSuitedCounts();
+          if (this.canFormMelds(c, suitIndex)) {
             return baseScore;
           }
         }
@@ -156,10 +199,86 @@ export class HandScore {
     return DEFAULT_NO_SCORE;
   });
 
+  allPung = computed<number>(() => {
+    const baseScore = 2;
+    const bonusScore = 3;
+    const tiles = this.handTiles();
+
+    if (!this.isValidHandSize()) {
+      return 0;
+    }
+
+    const suitedTiles = tiles.filter(
+      (t) => t.type === TileType.SUITED,
+    ) as SuitedTile[];
+    const honourTiles = tiles.filter(
+      (t) => t.type === TileType.HONOUR,
+    ) as HonourTile[];
+
+    // Only suited and honour tiles allowed
+    if (tiles.length !== suitedTiles.length + honourTiles.length) {
+      return DEFAULT_NO_SCORE;
+    }
+
+    // Count honour tiles by identity
+    const honourGroups = new Map<string, number>();
+    honourTiles.forEach((t) => {
+      const key = `${t.honour}-${t.value}`;
+      honourGroups.set(key, (honourGroups.get(key) ?? 0) + 1);
+    });
+
+    const honoursFormPungs = (groups: Map<string, number>): boolean => {
+      for (const count of groups.values()) {
+        if (count !== 0 && count !== 3 && count !== 4) return false;
+      }
+      return true;
+    };
+
+    const checkEvenOddBonus = (): number => {
+      if (suitedTiles.length > 0) {
+        const allNumbers = suitedTiles.map((t) => t.number);
+        const allEven = allNumbers.every((n) => n % 2 === 0);
+        const allOdd = allNumbers.every((n) => n % 2 === 1);
+        if (allEven || allOdd) {
+          return baseScore + bonusScore;
+        }
+      }
+      return baseScore;
+    };
+
+    // Try pair from suited tiles
+    for (let s = 0; s < SUITE_COUNT; s++) {
+      for (let n = 1; n <= 9; n++) {
+        if (this.counts()[s][n] >= 2) {
+          const clone = this.counts().map((arr) => arr.slice());
+          clone[s][n] -= 2;
+          if (this.canFormAllPungs(clone) && honoursFormPungs(honourGroups)) {
+            return checkEvenOddBonus();
+          }
+        }
+      }
+    }
+
+    // Try pair from honour tiles
+    for (const [key, count] of honourGroups) {
+      if (count >= 2) {
+        const clone = new Map(honourGroups);
+        clone.set(key, count - 2);
+        if (
+          honoursFormPungs(clone) &&
+          this.canFormAllPungs(this.counts().map((arr) => arr.slice()))
+        ) {
+          return checkEvenOddBonus();
+        }
+      }
+    }
+
+    return DEFAULT_NO_SCORE;
+  });
+
   littleSevenPairs = computed<number>(() => {
     const baseScore = 6;
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (tiles.length !== 14) {
       return DEFAULT_NO_SCORE;
@@ -185,8 +304,7 @@ export class HandScore {
 
   bigSevenPairs = computed<number>(() => {
     const baseScore = 9;
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (tiles.length !== 14) {
       return DEFAULT_NO_SCORE;
@@ -210,8 +328,7 @@ export class HandScore {
 
   purityHand = computed<number>(() => {
     const baseScore = 9;
-    const currentPlayer = this.tableStore.entities()[0];
-    const tiles = currentPlayer.tiles;
+    const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return DEFAULT_NO_SCORE;
@@ -250,6 +367,7 @@ export class HandScore {
     return (
       this.allChi() +
       this.mixedTwoSuit() +
+      this.mixedHand() +
       this.allPung() +
       this.littleSevenPairs() +
       this.bigSevenPairs() +
@@ -261,6 +379,7 @@ export class HandScore {
     return (
       this.allChi() > 0 ||
       this.mixedTwoSuit() > 0 ||
+      this.mixedHand() > 0 ||
       this.allPung() > 0 ||
       this.littleSevenPairs() > 0 ||
       this.bigSevenPairs() > 0 ||

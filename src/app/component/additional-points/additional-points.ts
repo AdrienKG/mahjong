@@ -378,7 +378,7 @@ export class AdditionalPoints {
   // Rule 14: Own Flower
   ownFlower = computed<number>(() => {
     const player = this.tableStore.entities()[0];
-    const bonusTiles = player.bonusTiles ?? [];
+    const bonusTiles = player.tiles.filter((t) => t.type === TileType.BONUS);
 
     // Wind mapping: EAST=0, SOUTH=1, WEST=2, NORTH=3
     // Flower numbers: 1-4
@@ -400,12 +400,35 @@ export class AdditionalPoints {
     return hasOwnFlower ? 1 : DEFAULT_NO_SCORE;
   });
 
+  // Rule 14b: Own Season
+  ownSeason = computed<number>(() => {
+    const player = this.tableStore.entities()[0];
+    const bonusTiles = player.tiles.filter((t) => t.type === TileType.BONUS);
+
+    const windToSeasonNumber: Record<WindType, number> = {
+      [WindType.EAST]: 1,
+      [WindType.SOUTH]: 2,
+      [WindType.WEST]: 3,
+      [WindType.NORTH]: 4,
+    };
+
+    const expectedNumber = windToSeasonNumber[player.wind];
+    const hasOwnSeason = bonusTiles.some(
+      (t) =>
+        t.type === TileType.BONUS &&
+        (t as BonusTile).bonus === BonusTileType.SEASON &&
+        (t as BonusTile).number === expectedNumber,
+    );
+
+    return hasOwnSeason ? 1 : DEFAULT_NO_SCORE;
+  });
+
   // ========== 2-POINT RULES ==========
 
   // Rule 15: Bouquet/Garden (4 flowers OR 4 seasons, max 2 points)
   bouquetGarden = computed<number>(() => {
     const player = this.tableStore.entities()[0];
-    const bonusTiles = player.bonusTiles ?? [];
+    const bonusTiles = player.tiles.filter((t) => t.type === TileType.BONUS);
 
     const flowers = bonusTiles.filter(
       (t) =>
@@ -477,7 +500,7 @@ export class AdditionalPoints {
   // Rule 20: Any Kong
   anyKong = computed<number>(() => {
     const kongs = this.detectKongs();
-    return kongs.length > 0 ? 2 : DEFAULT_NO_SCORE;
+    return kongs.length * 2;
   });
 
   // ========== 3-POINT RULES ==========
@@ -671,6 +694,7 @@ export class AdditionalPoints {
       this.twoSuitDragon() +
       this.littleFlower() +
       this.ownFlower() +
+      this.ownSeason() +
       this.bouquetGarden() +
       this.doubleWinds() +
       this.twelveExposed() +

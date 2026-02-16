@@ -10,7 +10,7 @@ app-odds-panel {
   overflow-y: auto;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 800px) {
   :host {
     overflow: hidden;
 
@@ -18,7 +18,7 @@ app-odds-panel {
   }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
   :host {
     grid-template-rows: 1fr auto;
   }

@@ -4,6 +4,7 @@ import { PlayerSeat } from '../../model/player-seat';
 import { WindType } from '../../model/wind-type';
 import { TableStore } from '../../store/table-store';
 import { Player } from '../player/player';
+import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog';
 import { WindSlectorDialog } from '../wind-slector-dialog/wind-slector-dialog';
 
 @Component({
@@ -20,7 +21,14 @@ export class Table {
   tableStore = inject(TableStore);
 
   onPickup() {
-    this.tableStore.pickupTile();
+    this.dialog
+      .open(TileSelectorDialog)
+      .afterClosed()
+      .subscribe((tileId: string) => {
+        if (tileId) {
+          this.tableStore.pickupTile(PlayerSeat.current, undefined, tileId);
+        }
+      });
   }
 
   onChangeWind() {

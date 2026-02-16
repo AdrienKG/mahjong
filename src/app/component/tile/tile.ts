@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,9 +15,6 @@ import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog
   imports: [MatButtonModule, MatMenuModule, MatIconModule, TileDisplayPipe],
   templateUrl: './tile.html',
   styleUrl: './tile.scss',
-  host: {
-    '[class.selected]': 'isSelected()',
-  },
 })
 export class Tile {
   private tableStore = inject(TableStore);
@@ -25,8 +22,6 @@ export class Tile {
   public tile = input.required<TileInt>();
   public playerId = input.required<PlayerSeat>();
 
-  private readonly selected = signal(false);
-  public readonly isSelected = computed(() => this.selected());
   public readonly isUnknown = computed(
     () => this.tile().type === TileType.UNKNOWN,
   );
@@ -37,10 +32,6 @@ export class Tile {
     if (!player) return false;
     return player.exposedTiles.some((t) => t.id === this.tile().id);
   });
-
-  onClick() {
-    this.selected.update((value) => !value);
-  }
 
   onSet() {
     this.dialog

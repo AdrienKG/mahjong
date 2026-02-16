@@ -5,9 +5,9 @@
     <div class="tiles-container">
       @for (tile of sets.tiles.values(); track tile) {
         <button
-          [matButton]="selectedTileId() === tile[0].id ? 'filled' : 'tonal'"
+          matButton="tonal"
           class="tile-button"
-          (click)="selectedTileId.set(tile[0].id)"
+          [mat-dialog-close]="tile[0].id"
         >
           {{ tile[0] | tileDisplay }}
         </button>
@@ -15,9 +15,3 @@
     </div>
   }
 </mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button matButton mat-dialog-close>Cancel</button>
-  <button matButton [mat-dialog-close]="selectedTileId()" cdkFocusInitial>
-    Set
-  </button>
-</mat-dialog-actions>
