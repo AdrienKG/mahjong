@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PlayerSeat } from '../../model/player-seat';
 
 import { Player } from './player';
 
@@ -13,6 +14,7 @@ describe('Player', () => {
 
     fixture = TestBed.createComponent(Player);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('playerSeat', PlayerSeat.current);
     fixture.detectChanges();
   });
 

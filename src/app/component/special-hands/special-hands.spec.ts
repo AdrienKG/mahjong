@@ -4,11 +4,17 @@ import { TableStore } from '../../store/table-store';
 import { SuitedTile, SuitedTileType } from '../../model/suited-tile';
 import { TileType } from '../../model/tile-type';
 import { HonourTile, HonourTileType } from '../../model/honour-tile';
+import {
+  BonusTile,
+  BonusTileColor,
+  BonusTileType,
+} from '../../model/bonus-tile';
 import { WindType } from '../../model/wind-type';
 import { DragonType } from '../../model/dragon-type';
 import { Tile } from '../../model/tile';
 import { v4 as uuidv4 } from 'uuid';
 import { patchState } from '@ngrx/signals';
+import { updateEntity } from '@ngrx/signals/entities';
 
 describe('SpecialHands', () => {
   let component: SpecialHands;
@@ -56,10 +62,10 @@ describe('SpecialHands', () => {
 
   function setPlayerTiles(tiles: any[]) {
     const currentPlayer = tableStore.entities()[0];
-    tableStore.entityMap()[currentPlayer.id] = {
-      ...currentPlayer,
-      tiles,
-    };
+    patchState(
+      tableStore as any,
+      updateEntity({ id: currentPlayer.id, changes: { tiles } as any }),
+    );
   }
 
   function setPlayerState(overrides: {
@@ -68,10 +74,10 @@ describe('SpecialHands', () => {
     wind?: WindType;
   }) {
     const currentPlayer = tableStore.entities()[0];
-    tableStore.entityMap()[currentPlayer.id] = {
-      ...currentPlayer,
-      ...overrides,
-    };
+    patchState(
+      tableStore as any,
+      updateEntity({ id: currentPlayer.id, changes: overrides as any }),
+    );
   }
 
   /** Builds the standard 13-orphans base: one of each terminal/honour. */
@@ -110,6 +116,16 @@ describe('SpecialHands', () => {
     count: number,
   ): SuitedTile[] {
     return Array.from({ length: count }, () => createSuitedTile(suite, number));
+  }
+
+  function createBonusTile(): BonusTile {
+    return {
+      id: uuidv4(),
+      type: TileType.BONUS,
+      bonus: BonusTileType.FLOWER,
+      number: 1,
+      color: BonusTileColor.BLACK,
+    } as BonusTile;
   }
 
   // ==================== THIRTEEN ORPHANS ====================
@@ -422,8 +438,9 @@ describe('SpecialHands', () => {
         expect(component.heavensHand()).toBe(0);
       });
 
-      it('should score 0 when hand has too few unique tile types (< 5)', () => {
-        // 4 unique tile types: simplified hasValidWinningHand rejects tileCount.size < 5
+      it('should score 15 for valid winning hand with few unique tile types', () => {
+        // B1×4, B2×4, B3×4, B4×2 = kong(1)+kong(2)+kong(3)+pair(4) — valid winning hand
+        // East wind + empty discard → Heaven's Hand
         const tiles = [
           ...createSuitedTiles(SuitedTileType.BAMBOO, 1, 4),
           ...createSuitedTiles(SuitedTileType.BAMBOO, 2, 4),
@@ -431,7 +448,7 @@ describe('SpecialHands', () => {
           ...createSuitedTiles(SuitedTileType.BAMBOO, 4, 2),
         ];
         setPlayerTiles(tiles);
-        expect(component.heavensHand()).toBe(0);
+        expect(component.heavensHand()).toBe(15);
       });
     });
   });
@@ -527,8 +544,8 @@ describe('SpecialHands', () => {
           ...createSuitedTiles(SuitedTileType.CHARACTER, 1, 3),
           ...createSuitedTiles(SuitedTileType.CHARACTER, 3, 3),
           ...createSuitedTiles(SuitedTileType.CHARACTER, 5, 4), // kong
-          ...createSuitedTiles(SuitedTileType.CHARACTER, 7, 2),
-          ...createSuitedTiles(SuitedTileType.CHARACTER, 9, 2),
+          ...createSuitedTiles(SuitedTileType.CHARACTER, 7, 3),
+          ...createSuitedTiles(SuitedTileType.CHARACTER, 9, 2), // pair
         ];
         setPlayerTiles(tiles);
         expect(component.allHiddenPungKong()).toBe(15);
@@ -1541,6 +1558,9 @@ describe('SpecialHands', () => {
 
   describe('totalPoints', () => {
     it('should return 0 for a non-special hand', () => {
+      // Add a discard tile so heavensHand doesn't trigger (East wind + empty discard)
+      const discardTile = createSuitedTile(SuitedTileType.DOTS, 1);
+      patchState(tableStore as any, { discard: [discardTile] });
       const tiles = [
         createSuitedTile(SuitedTileType.BAMBOO, 1),
         createSuitedTile(SuitedTileType.BAMBOO, 2),
@@ -1628,6 +1648,123 @@ describe('SpecialHands', () => {
       ];
       setPlayerTiles(tiles);
       expect(component.hasSpecialHand()).toBe(true);
+    });
+  });
+
+  // ==================== BONUS TILE REGRESSION TESTS ====================
+  // These tests verify that bonus tiles (flowers/seasons) in player.tiles
+  // don't break special hand detection. Bonus tiles should be filtered out before scoring.
+
+  describe('Bonus tile regression tests', () => {
+    it('thirteenOrphans should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createOrphanBase(),
+        createWindTile(WindType.EAST),
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.thirteenOrphans()).toBe(15);
+    });
+
+    it('allHiddenPungKong should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 1, 3),
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 3, 3),
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 5, 3),
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 7, 3),
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 9, 2),
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.allHiddenPungKong()).toBe(15);
+    });
+
+    it('fourSmallWinds should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createWindTiles(WindType.EAST, 3),
+        ...createWindTiles(WindType.SOUTH, 3),
+        ...createWindTiles(WindType.WEST, 3),
+        ...createWindTiles(WindType.NORTH, 2),
+        ...createSuitedTiles(SuitedTileType.DOTS, 5, 3),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.fourSmallWinds()).toBe(15);
+    });
+
+    it('fourBigWinds should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createWindTiles(WindType.EAST, 3),
+        ...createWindTiles(WindType.SOUTH, 3),
+        ...createWindTiles(WindType.WEST, 3),
+        ...createWindTiles(WindType.NORTH, 3),
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 5, 2),
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.fourBigWinds()).toBe(15);
+    });
+
+    it('threeBigDragons should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createDragonTiles(DragonType.RED, 3),
+        ...createDragonTiles(DragonType.GREEN, 3),
+        ...createDragonTiles(DragonType.WHITE, 3),
+        ...createSuitedTiles(SuitedTileType.CHARACTER, 7, 3),
+        ...createSuitedTiles(SuitedTileType.CHARACTER, 9, 2),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.threeBigDragons()).toBe(15);
+    });
+
+    it('allTerminalHand should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 1, 3),
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 9, 3),
+        ...createSuitedTiles(SuitedTileType.CHARACTER, 1, 3),
+        ...createSuitedTiles(SuitedTileType.CHARACTER, 9, 3),
+        ...createSuitedTiles(SuitedTileType.DOTS, 1, 2),
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.allTerminalHand()).toBe(15);
+    });
+
+    it('allHonoursHand should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createWindTiles(WindType.EAST, 3),
+        ...createWindTiles(WindType.SOUTH, 3),
+        ...createWindTiles(WindType.WEST, 3),
+        ...createDragonTiles(DragonType.RED, 3),
+        ...createDragonTiles(DragonType.GREEN, 2),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.allHonoursHand()).toBe(15);
+    });
+
+    it('nineConnectedSons should score 15 when valid hand has bonus tiles', () => {
+      const tiles = [
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 1, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 8),
+        ...createSuitedTiles(SuitedTileType.BAMBOO, 9, 3),
+        createBonusTile(),
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.nineConnectedSons()).toBe(15);
     });
   });
 });

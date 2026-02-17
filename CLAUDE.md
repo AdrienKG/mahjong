@@ -9,7 +9,8 @@ A **Mahjong scoring calculator** built as a client-side Angular application. It 
 ## Commands
 
 - `npm start` - Dev server at http://localhost:4200
-- `npm test` - Unit tests (Karma + Jasmine, launches Chrome)
+- `npm test` - Unit tests (Vitest, no browser needed)
+- `npm run test:ci` - Unit tests single run (no watch)
 - `npm run build` - Production build
 - `npm run format` - Prettier formatting
 
@@ -70,3 +71,7 @@ Display formatting: tile-display (e.g. "3B", "GD"), sort-tiles, tile-filter, pro
 - The `counts` array pattern (`number[3][10]`, indices: suite 0-2, number 1-9, index 0 unused for honours) is used across hand-score and special-hands for meld detection
 - Tiles have UUID-based `id` fields for identity tracking; `getTileKey()` generates semantic keys for value comparison
 - Exposed tiles are tracked separately from hand tiles and affect scoring (e.g., all-hidden-pung-kong requires no exposed tiles)
+
+## Workflow Rules
+
+- **Always run `npm run test:ci` at the end of every prompt and fix any failures before responding.**

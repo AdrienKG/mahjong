@@ -13,6 +13,8 @@ import {
   BonusTileType,
 } from '../../model/bonus-tile';
 import { v4 as uuidv4 } from 'uuid';
+import { patchState } from '@ngrx/signals';
+import { updateEntity } from '@ngrx/signals/entities';
 
 describe('HandScore', () => {
   let component: HandScore;
@@ -78,10 +80,10 @@ describe('HandScore', () => {
   // Helper function to set player tiles
   function setPlayerTiles(tiles: any[]) {
     const currentPlayer = tableStore.entities()[0];
-    tableStore.entityMap()[currentPlayer.id] = {
-      ...currentPlayer,
-      tiles,
-    };
+    patchState(
+      tableStore as any,
+      updateEntity({ id: currentPlayer.id, changes: { tiles } as any }),
+    );
   }
 
   describe('allChi computed signal - Comprehensive Tests', () => {
@@ -562,7 +564,8 @@ describe('HandScore', () => {
         expect(component.allChi()).toBe(0);
       });
 
-      it('should score 0 for seven pairs hand', () => {
+      it('should score 1 for seven pairs hand (also decomposes as all-chi)', () => {
+        // B1-1,2-2,3-3,4-4,5-5,6-6,7-7 can be: pair(1) + chis 2-3-4,2-3-4,5-6-7,5-6-7
         const tiles = [
           createSuitedTile(SuitedTileType.BAMBOO, 1),
           createSuitedTile(SuitedTileType.BAMBOO, 1),
@@ -580,7 +583,7 @@ describe('HandScore', () => {
           createSuitedTile(SuitedTileType.BAMBOO, 7),
         ];
         setPlayerTiles(tiles);
-        expect(component.allChi()).toBe(0);
+        expect(component.allChi()).toBe(1);
       });
 
       it('should score 0 for hand with no pair', () => {
@@ -774,11 +777,9 @@ describe('HandScore', () => {
         expect(component.allChi()).toBe(1);
       });
 
-      it('should score 1 for complex overlapping valid hand', () => {
+      it('should score 0 for all-pung hand (not decomposable as all-chi)', () => {
+        // B1×2, B2×3, B3×3, B4×3, B5×3 = pungs(2,3,4,5) + pair(1)
         const tiles = [
-          // This represents: 1-1-1-2-2-2-3-3-3-4-4-4-5-5
-          // Can be: (1-2-3)(1-2-3)(1-2-3)(4-4-4) + pair(5-5)? No, that's a pung
-          // Or: (1-2-3)(1-2-3)(2-3-4)(2-3-4) + pair(1-1)
           createSuitedTile(SuitedTileType.BAMBOO, 1),
           createSuitedTile(SuitedTileType.BAMBOO, 1),
           createSuitedTile(SuitedTileType.BAMBOO, 2),
@@ -795,7 +796,7 @@ describe('HandScore', () => {
           createSuitedTile(SuitedTileType.BAMBOO, 5),
         ];
         setPlayerTiles(tiles);
-        expect(component.allChi()).toBe(1);
+        expect(component.allChi()).toBe(0);
       });
 
       it('should score 1 for all-chi hand with mixed suits in specific pattern', () => {
@@ -967,7 +968,7 @@ describe('HandScore', () => {
 
   describe('allPung computed signal - Kong Support', () => {
     describe('Valid All-Pung Hands with Kongs', () => {
-      it('should score 2 for all-pung hand with one Kong (15 tiles)', () => {
+      it('should score 5 (2+3 all-odd bonus) for all-pung hand with one Kong (15 tiles)', () => {
         const tiles = [
           // Kong: 4x Bamboo-1
           createSuitedTile(SuitedTileType.BAMBOO, 1),
@@ -991,10 +992,10 @@ describe('HandScore', () => {
           createSuitedTile(SuitedTileType.BAMBOO, 9),
         ];
         setPlayerTiles(tiles);
-        expect(component.allPung()).toBe(2);
+        expect(component.allPung()).toBe(5);
       });
 
-      it('should score 2 for all-pung hand with two Kongs (16 tiles)', () => {
+      it('should score 5 (2+3 all-odd bonus) for all-pung hand with two Kongs (16 tiles)', () => {
         const tiles = [
           // Kong: 4x Bamboo-1
           createSuitedTile(SuitedTileType.BAMBOO, 1),
@@ -1019,10 +1020,10 @@ describe('HandScore', () => {
           createSuitedTile(SuitedTileType.BAMBOO, 9),
         ];
         setPlayerTiles(tiles);
-        expect(component.allPung()).toBe(2);
+        expect(component.allPung()).toBe(5);
       });
 
-      it('should score 2 for all-pung hand with four Kongs (18 tiles)', () => {
+      it('should score 5 (2+3 all-odd bonus) for all-pung hand with four Kongs (18 tiles)', () => {
         const tiles = [
           // Kong: 4x Bamboo-1
           createSuitedTile(SuitedTileType.BAMBOO, 1),
@@ -1049,7 +1050,7 @@ describe('HandScore', () => {
           createSuitedTile(SuitedTileType.BAMBOO, 9),
         ];
         setPlayerTiles(tiles);
-        expect(component.allPung()).toBe(2);
+        expect(component.allPung()).toBe(5);
       });
 
       it('should score 5 (2+3 bonus) for all-pung even-number hand with Kong', () => {
@@ -2042,6 +2043,231 @@ describe('HandScore', () => {
       ];
       setPlayerTiles(tiles);
       expect(component.bigSevenPairs()).toBe(0);
+    });
+  });
+
+  // ==================== BONUS TILE REGRESSION TESTS ====================
+  // These tests verify that bonus tiles (flowers/seasons) in player.tiles
+  // don't break hand detection. Bonus tiles should be filtered out before scoring.
+
+  describe('Bonus tile regression tests', () => {
+    it('allChi should score 1 when valid all-chi hand has bonus tiles', () => {
+      const tiles = [
+        // Chi 1: 1-2-3 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        // Chi 2: 1-2-3 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        // Chi 3: 4-5-6 Character
+        createSuitedTile(SuitedTileType.CHARACTER, 4),
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        createSuitedTile(SuitedTileType.CHARACTER, 6),
+        // Chi 4: 7-8-9 Character
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        createSuitedTile(SuitedTileType.CHARACTER, 8),
+        createSuitedTile(SuitedTileType.CHARACTER, 9),
+        // Eyes: 8-8 Dots
+        createSuitedTile(SuitedTileType.DOTS, 8),
+        createSuitedTile(SuitedTileType.DOTS, 8),
+        // Bonus tiles (should be ignored)
+        createBonusTile(),
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.allChi()).toBe(1);
+    });
+
+    it('mixedTwoSuit should score 1 when valid hand has bonus tiles', () => {
+      const tiles = [
+        // Chi 1: 1-2-3 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        // Chi 2: 4-5-6 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        // Chi 3: 1-2-3 Character
+        createSuitedTile(SuitedTileType.CHARACTER, 1),
+        createSuitedTile(SuitedTileType.CHARACTER, 2),
+        createSuitedTile(SuitedTileType.CHARACTER, 3),
+        // Chi 4: 4-5-6 Character
+        createSuitedTile(SuitedTileType.CHARACTER, 4),
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        createSuitedTile(SuitedTileType.CHARACTER, 6),
+        // Eyes: 9-9 Character
+        createSuitedTile(SuitedTileType.CHARACTER, 9),
+        createSuitedTile(SuitedTileType.CHARACTER, 9),
+        // Bonus tiles
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.mixedTwoSuit()).toBe(1);
+    });
+
+    it('mixedHand should score 2 when valid mixed hand has bonus tiles', () => {
+      const tiles = [
+        // Chi 1: 1-2-3 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        // Chi 2: 4-5-6 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        // Pung of East winds
+        createWindTile(WindType.EAST),
+        createWindTile(WindType.EAST),
+        createWindTile(WindType.EAST),
+        // Pung of Red dragons
+        createDragonTile(DragonType.RED),
+        createDragonTile(DragonType.RED),
+        createDragonTile(DragonType.RED),
+        // Eyes: 9-9 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 9),
+        createSuitedTile(SuitedTileType.BAMBOO, 9),
+        // Bonus tiles
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.mixedHand()).toBe(2);
+    });
+
+    it('allPung should score 2 for suited pungs + honour pung + honour pair (no bonus)', () => {
+      const tiles = [
+        // Pung: 8-8-8 Dots (even)
+        createSuitedTile(SuitedTileType.DOTS, 8),
+        createSuitedTile(SuitedTileType.DOTS, 8),
+        createSuitedTile(SuitedTileType.DOTS, 8),
+        // Pung: 1-1-1 Bamboo (odd - mixed even/odd avoids bonus)
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        // Pung: 7-7-7 Character (odd)
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        // Pung: Green Dragon
+        createDragonTile(DragonType.GREEN),
+        createDragonTile(DragonType.GREEN),
+        createDragonTile(DragonType.GREEN),
+        // Eyes: White Dragon pair
+        createDragonTile(DragonType.WHITE),
+        createDragonTile(DragonType.WHITE),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.allPung()).toBe(2);
+    });
+
+    it('allPung should score 2 when valid all-pung hand has bonus tiles', () => {
+      const tiles = [
+        // Pung: 2-2-2 Bamboo (even - mixed even/odd avoids bonus)
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        // Pung: 5-5-5 Character (odd)
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        // Pung: 7-7-7 Dots (odd)
+        createSuitedTile(SuitedTileType.DOTS, 7),
+        createSuitedTile(SuitedTileType.DOTS, 7),
+        createSuitedTile(SuitedTileType.DOTS, 7),
+        // Pung: East Wind
+        createWindTile(WindType.EAST),
+        createWindTile(WindType.EAST),
+        createWindTile(WindType.EAST),
+        // Eyes: 9-9 Bamboo
+        createSuitedTile(SuitedTileType.BAMBOO, 9),
+        createSuitedTile(SuitedTileType.BAMBOO, 9),
+        // Bonus tiles
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.allPung()).toBe(2);
+    });
+
+    it('littleSevenPairs should score 6 when valid 7-pairs hand has bonus tiles', () => {
+      const tiles = [
+        createSuitedTile(SuitedTileType.DOTS, 3),
+        createSuitedTile(SuitedTileType.DOTS, 3),
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        createSuitedTile(SuitedTileType.CHARACTER, 7),
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        createSuitedTile(SuitedTileType.CHARACTER, 5),
+        createSuitedTile(SuitedTileType.DOTS, 5),
+        createSuitedTile(SuitedTileType.DOTS, 5),
+        createSuitedTile(SuitedTileType.DOTS, 6),
+        createSuitedTile(SuitedTileType.DOTS, 6),
+        createSuitedTile(SuitedTileType.CHARACTER, 1),
+        createSuitedTile(SuitedTileType.CHARACTER, 1),
+        createWindTile(WindType.EAST),
+        createWindTile(WindType.EAST),
+        // Bonus tiles
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.littleSevenPairs()).toBe(6);
+    });
+
+    it('bigSevenPairs should score 9 when valid consecutive pairs hand has bonus tiles', () => {
+      const tiles = [
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 1),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 2),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 3),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 4),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 5),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 6),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        createSuitedTile(SuitedTileType.BAMBOO, 7),
+        // Bonus tiles
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.bigSevenPairs()).toBe(9);
+    });
+
+    it('purityHand should score 9 when valid single-suit hand has bonus tiles', () => {
+      const tiles = [
+        // Chi: 1-2-3
+        createSuitedTile(SuitedTileType.DOTS, 1),
+        createSuitedTile(SuitedTileType.DOTS, 2),
+        createSuitedTile(SuitedTileType.DOTS, 3),
+        // Chi: 4-5-6
+        createSuitedTile(SuitedTileType.DOTS, 4),
+        createSuitedTile(SuitedTileType.DOTS, 5),
+        createSuitedTile(SuitedTileType.DOTS, 6),
+        // Chi: 4-5-6
+        createSuitedTile(SuitedTileType.DOTS, 4),
+        createSuitedTile(SuitedTileType.DOTS, 5),
+        createSuitedTile(SuitedTileType.DOTS, 6),
+        // Chi: 7-8-9
+        createSuitedTile(SuitedTileType.DOTS, 7),
+        createSuitedTile(SuitedTileType.DOTS, 8),
+        createSuitedTile(SuitedTileType.DOTS, 9),
+        // Eyes: 1-1
+        createSuitedTile(SuitedTileType.DOTS, 1),
+        createSuitedTile(SuitedTileType.DOTS, 1),
+        // Bonus tiles
+        createBonusTile(),
+        createBonusTile(),
+        createBonusTile(),
+      ];
+      setPlayerTiles(tiles);
+      expect(component.purityHand()).toBe(9);
     });
   });
 });

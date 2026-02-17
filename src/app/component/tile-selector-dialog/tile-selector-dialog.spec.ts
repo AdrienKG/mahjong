@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
 
 import { TileSelectorDialog } from './tile-selector-dialog';
 
@@ -9,6 +10,7 @@ describe('TileSelectorDialog', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TileSelectorDialog],
+      providers: [TileDisplayPipe],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TileSelectorDialog);

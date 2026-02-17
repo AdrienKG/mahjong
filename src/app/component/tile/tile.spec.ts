@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PlayerSeat } from '../../model/player-seat';
+import { TileType } from '../../model/tile-type';
 
 import { Tile } from './tile';
 
@@ -13,6 +15,11 @@ describe('Tile', () => {
 
     fixture = TestBed.createComponent(Tile);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('tile', {
+      id: 'test-id',
+      type: TileType.UNKNOWN,
+    });
+    fixture.componentRef.setInput('playerId', PlayerSeat.current);
     fixture.detectChanges();
   });
 

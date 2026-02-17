@@ -13,7 +13,9 @@
       "Bash(grep:*)",
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
-      "Bash(npm run test:ci:*)"
+      "Bash(npm run test:ci:*)",
+      "Bash(tee:*)",
+      "Bash(/tmp/analysis.md:*)"
     ]
   }
 }

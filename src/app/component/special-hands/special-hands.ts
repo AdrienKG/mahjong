@@ -643,17 +643,11 @@ export class SpecialHands {
   }
 
   private hasValidWinningHand(): boolean {
-    // Simplified check: any hand with valid structure could be a winning hand
-    // This checks if tiles can form 4 melds + 1 pair
     const tiles = this.handTiles();
 
     if (!this.isValidHandSize()) {
       return false;
     }
-
-    // Try to form any valid hand structure
-    // For simplicity, we'll check if it matches any of the basic patterns
-    // A complete implementation would need to check all possible meld combinations
 
     // Check for 7 pairs
     const tileCount = new Map<string, number>();
@@ -669,8 +663,100 @@ export class SpecialHands {
       return true;
     }
 
-    // Check for standard 4 melds + pair pattern
-    // This is simplified - a full implementation would need recursive checking
-    return tileCount.size >= 5 && tileCount.size <= 13;
+    // Check for standard 4 melds + pair pattern using recursive backtracking
+    // Build counts array for suited tiles
+    const suitedCounts: number[][] = Array.from({ length: SUITE_COUNT }, () =>
+      Array(10).fill(0),
+    );
+    // Build honour counts
+    const honourGroups = new Map<string, number>();
+
+    tiles.forEach((t) => {
+      if (t.type === TileType.SUITED) {
+        const st = t as SuitedTile;
+        suitedCounts[st.suite][st.number]++;
+      } else if (t.type === TileType.HONOUR) {
+        const ht = t as HonourTile;
+        const key = `${ht.honour}-${ht.value}`;
+        honourGroups.set(key, (honourGroups.get(key) ?? 0) + 1);
+      }
+    });
+
+    const honoursCanFormMelds = (groups: Map<string, number>): boolean => {
+      for (const count of groups.values()) {
+        if (count !== 0 && count !== 3 && count !== 4) return false;
+      }
+      return true;
+    };
+
+    const canFormMelds = (c: number[][]): boolean => {
+      for (let s = 0; s < SUITE_COUNT; s++) {
+        for (let n = 1; n <= 9; n++) {
+          if (c[s][n] > 0) {
+            if (c[s][n] >= 4) {
+              c[s][n] -= 4;
+              if (canFormMelds(c)) {
+                c[s][n] += 4;
+                return true;
+              }
+              c[s][n] += 4;
+            }
+            if (c[s][n] >= 3) {
+              c[s][n] -= 3;
+              if (canFormMelds(c)) {
+                c[s][n] += 3;
+                return true;
+              }
+              c[s][n] += 3;
+            }
+            if (n + 2 <= 9 && c[s][n + 1] > 0 && c[s][n + 2] > 0) {
+              c[s][n]--;
+              c[s][n + 1]--;
+              c[s][n + 2]--;
+              if (canFormMelds(c)) {
+                c[s][n]++;
+                c[s][n + 1]++;
+                c[s][n + 2]++;
+                return true;
+              }
+              c[s][n]++;
+              c[s][n + 1]++;
+              c[s][n + 2]++;
+            }
+            return false;
+          }
+        }
+      }
+      return true;
+    };
+
+    // Try pair from suited tiles
+    for (let s = 0; s < SUITE_COUNT; s++) {
+      for (let n = 1; n <= 9; n++) {
+        if (suitedCounts[s][n] >= 2) {
+          const clone = suitedCounts.map((arr) => arr.slice());
+          clone[s][n] -= 2;
+          if (canFormMelds(clone) && honoursCanFormMelds(honourGroups)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Try pair from honour tiles
+    for (const [key, count] of honourGroups) {
+      if (count >= 2) {
+        const clone = new Map(honourGroups);
+        clone.set(key, count - 2);
+        if (honoursCanFormMelds(clone)) {
+          const suitedClone = suitedCounts.map((arr) => arr.slice());
+          if (canFormMelds(suitedClone)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 }
