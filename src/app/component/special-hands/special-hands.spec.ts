@@ -1609,13 +1609,13 @@ describe('SpecialHands', () => {
   describe('hasSpecialHand', () => {
     it('should return false for non-special hand', () => {
       setPlayerTiles([]);
-      expect(component.hasSpecialHand()).toBeFalse();
+      expect(component.hasSpecialHand()).toBe(false);
     });
 
     it('should return true for thirteen orphans', () => {
       const tiles = [...createOrphanBase(), createWindTile(WindType.EAST)];
       setPlayerTiles(tiles);
-      expect(component.hasSpecialHand()).toBeTrue();
+      expect(component.hasSpecialHand()).toBe(true);
     });
 
     it('should return true for all terminal hand', () => {
@@ -1627,7 +1627,7 @@ describe('SpecialHands', () => {
         ...createSuitedTiles(SuitedTileType.DOTS, 1, 2),
       ];
       setPlayerTiles(tiles);
-      expect(component.hasSpecialHand()).toBeTrue();
+      expect(component.hasSpecialHand()).toBe(true);
     });
   });
 });

@@ -8,7 +8,12 @@
       "Bash(npx ng test:*)",
       "Bash(npm run build:*)",
       "mcp__angular-cli__find_examples",
-      "mcp__angular-cli__search_documentation"
+      "mcp__angular-cli__search_documentation",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run test:ci:*)"
     ]
   }
 }
