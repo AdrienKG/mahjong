@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Melds for {{ data.tileName }}</h2>
+<mat-dialog-content>
+  @if (data.possibleMelds.length === 0) {
+    <p class="no-melds">No melds available for this tile.</p>
+  } @else {
+    @for (meld of data.possibleMelds; track $index) {
+      <button
+        mat-button
+        class="meld-option"
+        [class.chi]="meld.meldType === 'chi'"
+        [class.pung]="meld.meldType === 'pung'"
+        [class.kong]="meld.meldType === 'kong'"
+        [mat-dialog-close]="meld"
+      >
+        <div class="meld-container">
+          <span class="meld-label">{{ meld.label }}</span>
+          <span class="meld-tiles">
+            @for (tile of meld.tiles; track tile.id) {
+              <span class="meld-tile">{{ tile | tileDisplay }}</span>
+            }
+          </span>
+        </div>
+      </button>
+    }
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>

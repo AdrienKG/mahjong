@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,6 +32,8 @@ export class Tile {
     if (!player) return false;
     return player.exposedTiles.some((t) => t.id === this.tile().id);
   });
+
+  tileClicked = output<void>();
 
   onSet() {
     this.dialog

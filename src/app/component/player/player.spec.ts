@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayerSeat } from '../../model/player-seat';
+import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
 
 import { Player } from './player';
 
@@ -10,6 +11,7 @@ describe('Player', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Player],
+      providers: [TileDisplayPipe],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Player);

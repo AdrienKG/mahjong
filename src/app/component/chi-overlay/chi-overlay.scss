@@ -8,6 +8,12 @@
   pointer-events: none;
 }
 
+@media (hover: none) {
+  :host {
+    display: none;
+  }
+}
+
 .meld-overlay {
   position: absolute;
   background: white;

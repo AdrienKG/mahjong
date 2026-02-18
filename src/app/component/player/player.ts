@@ -6,12 +6,26 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { SelectedMeld } from '../../model/player';
 import { PlayerSeat } from '../../model/player-seat';
+import { Tile as TileModel } from '../../model/tile';
+import { TileType } from '../../model/tile-type';
 import { TileGroup } from '../../model/tile-group';
+import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
 import { WindTypeDisplayPipe } from '../../pipe/wind-type-display-pipe';
 import { TableStore } from '../../store/table-store';
+import {
+  PossibleMeld,
+  computePossibleMelds,
+  computeTransitionOptions,
+} from '../../util/meld-detection';
 import { ChiOverlay, MeldTransition } from '../chi-overlay/chi-overlay';
+import {
+  MeldSelectorDialog,
+  MeldSelectorDialogData,
+} from '../meld-selector-dialog/meld-selector-dialog';
+import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog';
 import { Tile } from '../tile/tile';
 
 @Component({
@@ -22,6 +36,8 @@ import { Tile } from '../tile/tile';
 })
 export class Player {
   tableStore = inject(TableStore);
+  private dialog = inject(MatDialog);
+  private tileDisplayPipe = inject(TileDisplayPipe);
 
   playerSeat = input.required<PlayerSeat>();
 
@@ -41,6 +57,9 @@ export class Player {
   overlayBottom = signal<number>(0);
   showAbove = signal(false);
   private hideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  private isTouchDevice =
+    typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
 
   groupedHand = computed(() => {
     const allTiles = this.currentHand();
@@ -79,6 +98,87 @@ export class Player {
   });
 
   private hostEl = inject(ElementRef);
+
+  onTileClicked(tile: TileModel) {
+    if (tile.type === TileType.UNKNOWN) {
+      this.openTileSelector(tile);
+      return;
+    }
+
+    if (this.isTouchDevice) {
+      this.openMeldSelector(tile);
+    } else {
+      this.openTileSelector(tile);
+    }
+  }
+
+  private openTileSelector(tile: TileModel) {
+    this.dialog
+      .open(TileSelectorDialog)
+      .afterClosed()
+      .subscribe((tileId: string) => {
+        if (tileId) {
+          this.tableStore.pickupTile(this.playerSeat(), tile.id, tileId);
+        }
+      });
+  }
+
+  private openMeldSelector(tile: TileModel) {
+    const selectedMelds = this.player().selectedMelds || [];
+    const existingMeld = selectedMelds.find((m) => m.tileIds.includes(tile.id));
+
+    if (existingMeld?.meldType === 'chi') return;
+
+    let possibleMelds: PossibleMeld[];
+    if (existingMeld) {
+      possibleMelds = computeTransitionOptions(
+        tile,
+        existingMeld,
+        this.currentHand(),
+        selectedMelds,
+      );
+    } else {
+      possibleMelds = computePossibleMelds(
+        tile,
+        this.currentHand(),
+        selectedMelds,
+      );
+    }
+
+    const dialogRef = this.dialog.open(MeldSelectorDialog, {
+      data: {
+        possibleMelds,
+        tileName: this.tileDisplayPipe.transform(tile),
+      } as MeldSelectorDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((meld: PossibleMeld | undefined) => {
+      if (!meld) return;
+
+      if (existingMeld && meld.label === 'Upgrade to Kong') {
+        const newTile = meld.tiles.find(
+          (t) => !existingMeld.tileIds.includes(t.id),
+        );
+        if (newTile) {
+          this.onMeldUpgrade({
+            meldId: existingMeld.id,
+            newTileId: newTile.id,
+          });
+        }
+      } else if (existingMeld && meld.label === 'Downgrade to Pung') {
+        this.onMeldDowngrade({ meldId: existingMeld.id });
+      } else {
+        this.onMeldSelected({
+          id: '',
+          meldType: meld.meldType,
+          tileIds: meld.tiles.map((t) => t.id),
+          tileKey: meld.tileKey,
+          suite: meld.suite,
+          startNumber: meld.startNumber,
+        });
+      }
+    });
+  }
 
   onTileHover(tile: any, event: MouseEvent) {
     this.clearHideTimeout();
