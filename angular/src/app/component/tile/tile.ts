@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +21,7 @@ import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog
   selector: 'app-tile',
   imports: [MatButtonModule, MatMenuModule, MatIconModule, TileDisplayPipe],
   templateUrl: './tile.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile.scss',
 })
 export class Tile {

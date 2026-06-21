@@ -5,6 +5,7 @@ import {
   inject,
   input,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SelectedMeld } from '../../model/player';
@@ -32,6 +33,7 @@ import { Tile } from '../tile/tile';
   selector: 'app-player',
   imports: [ChiOverlay, Tile, WindTypeDisplayPipe],
   templateUrl: './player.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './player.scss',
 })
 export class Player {

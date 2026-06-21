@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerSeat } from '../../model/player-seat';
 import { WindType } from '../../model/wind-type';
@@ -11,6 +11,7 @@ import { WindSlectorDialog } from '../wind-slector-dialog/wind-slector-dialog';
   selector: 'app-table',
   imports: [Player],
   templateUrl: './table.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './table.scss',
 })
 export class Table {

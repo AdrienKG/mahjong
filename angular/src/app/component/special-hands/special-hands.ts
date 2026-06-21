@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   MatExpansionPanel,
   MatExpansionPanelHeader,
@@ -22,6 +27,7 @@ const SUITE_COUNT = 3;
   selector: 'app-special-hands',
   imports: [MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
   templateUrl: './special-hands.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './special-hands.scss',
 })
 export class SpecialHands {

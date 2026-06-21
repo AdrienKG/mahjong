@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   MatExpansionPanel,
   MatExpansionPanelHeader,
@@ -19,6 +24,7 @@ const MAX_HAND_SIZE = 18;
   selector: 'app-hand-score',
   imports: [MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
   templateUrl: './hand-score.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './hand-score.scss',
 })
 export class HandScore {

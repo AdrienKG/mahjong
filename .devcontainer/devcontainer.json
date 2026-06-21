@@ -1,8 +1,7 @@
 {
   "name": "Mahjong",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bullseye",
+  "dockerFile": "Dockerfile",
   "features": {
-    "ghcr.io/devcontainers-extra/features/angular-cli:2": {},
     "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
       "theme": "cypher"
     }
@@ -10,9 +9,8 @@
   "runArgs": ["--network=host"],
   "customizations": {
     "vscode": {
-      "extensions": ["angular.ng-template", "Anthropic.claude-code"]
+      "extensions": ["angular.ng-template"]
     }
   },
-  "forwardPorts": [4200],
-  "postCreateCommand": "curl -fsSL https://claude.ai/install.sh | bash"
+  "forwardPorts": [4200]
 }

@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { BonusTile, BonusTileType } from '../../model/bonus-tile';
@@ -19,6 +24,7 @@ interface TileCategory {
   selector: 'app-tile-chooser-dialog',
   imports: [CommonModule, MatButtonModule, MatDialogModule, TileDisplayPipe],
   templateUrl: './tile-selector-dialog.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile-selector-dialog.scss',
 })
 export class TileSelectorDialog {

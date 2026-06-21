@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   MatExpansionPanel,
   MatExpansionPanelHeader,
@@ -32,6 +37,7 @@ interface Pung {
   selector: 'app-additional-points',
   imports: [MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
   templateUrl: './additional-points.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './additional-points.scss',
 })
 export class AdditionalPoints {

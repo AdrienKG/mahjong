@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { SelectedMeld } from '../../model/player';
 import { PlayerSeat } from '../../model/player-seat';
 import { Tile } from '../../model/tile';
@@ -16,6 +22,7 @@ export type { PossibleMeld, MeldTransition } from '../../util/meld-detection';
   selector: 'app-chi-overlay',
   imports: [TileDisplayPipe],
   templateUrl: './chi-overlay.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './chi-overlay.scss',
 })
 export class ChiOverlay {

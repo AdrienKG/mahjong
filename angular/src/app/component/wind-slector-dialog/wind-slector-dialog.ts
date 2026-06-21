@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { WindType } from '../../model/wind-type';
@@ -7,6 +7,7 @@ import { WindType } from '../../model/wind-type';
   selector: 'app-wind-slector-dialog',
   imports: [MatButtonModule, MatDialogModule],
   templateUrl: './wind-slector-dialog.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './wind-slector-dialog.scss',
 })
 export class WindSlectorDialog {
