@@ -39,19 +39,3 @@
     }
   }
 </div>
-<app-chi-overlay
-  [hoveredTile]="hoveredTile()"
-  [availableTiles]="currentHand()"
-  [selectedMelds]="player().selectedMelds || []"
-  [hoveredMeld]="hoveredMeld()"
-  [playerId]="playerSeat()"
-  [overlayLeft]="overlayLeft()"
-  [tileTop]="overlayTop()"
-  [tileBottom]="overlayBottom()"
-  [showAbove]="showAbove()"
-  (meldSelected)="onMeldSelected($event)"
-  (meldUpgrade)="onMeldUpgrade($event)"
-  (meldDowngrade)="onMeldDowngrade($event)"
-  (overlayEnter)="onOverlayMouseEnter()"
-  (overlayLeave)="onOverlayMouseLeave()"
-></app-chi-overlay>

@@ -25,13 +25,10 @@ import { WindType } from '../model/wind-type';
 type TableState = {
   wind: WindType;
   discard: Tile[];
-  tiles: Tile[];
-  wall: number;
-  drawnFromWall: boolean;
-  drawnFromDeadWall: boolean;
+  wallTiles: Tile[];
 };
 
-const setupTiles = (): Tile[] => {
+const setupTables = (): Tile[] => {
   const tiles: Tile[] = [];
   for (let i = 1; i <= 4; i++) {
     // 4 copies of each
@@ -40,19 +37,19 @@ const setupTiles = (): Tile[] => {
         id: uuidv4(),
         type: TileType.SUITED,
         suite: SuitedTileType.BAMBOO,
-        number: j as unknown as number,
+        number: j,
       } as SuitedTile);
       tiles.push({
         id: uuidv4(),
         type: TileType.SUITED,
         suite: SuitedTileType.CHARACTER,
-        number: j as unknown as number,
+        number: j,
       } as SuitedTile);
       tiles.push({
         id: uuidv4(),
         type: TileType.SUITED,
         suite: SuitedTileType.DOTS,
-        number: j as unknown as number,
+        number: j,
       } as SuitedTile);
     }
 
