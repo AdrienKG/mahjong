@@ -1,11 +1,9 @@
 <div class="table-rows">
   <div class="row east">
-    <app-player [playerSeat]="playerSeat.current"></app-player>
+    <app-player [wind]="tableStore.eastPlayer().wind" [hand]="tableStore.eastPlayer().hand"></app-player>
   </div>
 </div>
 
 <div class="extra controls">
   <button mat-button (click)="onPickup()">Pickup</button>
-  <button mat-button (click)="onChangeWind()">Change Wind</button>
-  <button mat-button (click)="onRandomizeHand()">Randomize Hand</button>
 </div>

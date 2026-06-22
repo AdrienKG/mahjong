@@ -3,16 +3,15 @@ import {
   computed,
   inject,
   input,
-  output,
-  ChangeDetectionStrategy,
+  output
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { PlayerSeat } from '../../model/player-seat';
 import { Tile as TileInt } from '../../model/tile';
 import { TileType } from '../../model/tile-type';
+import { WindType } from '../../model/wind-type';
 import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
 import { TableStore } from '../../store/table-store';
 import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog';
@@ -21,25 +20,18 @@ import { TileSelectorDialog } from '../tile-selector-dialog/tile-selector-dialog
   selector: 'app-tile',
   imports: [MatButtonModule, MatMenuModule, MatIconModule, TileDisplayPipe],
   templateUrl: './tile.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile.scss',
 })
 export class Tile {
   private tableStore = inject(TableStore);
   private dialog = inject(MatDialog);
   public tile = input.required<TileInt>();
-  public playerId = input.required<PlayerSeat>();
+  public playerId = input.required<WindType>();
 
   public readonly isUnknown = computed(
     () => this.tile().type === TileType.UNKNOWN,
   );
-  public readonly isExposed = computed(() => {
-    const player = this.tableStore
-      .entities()
-      .find((p) => p.id === this.playerId());
-    if (!player) return false;
-    return player.exposedTiles.some((t) => t.id === this.tile().id);
-  });
+  
 
   tileClicked = output<void>();
 
@@ -48,17 +40,17 @@ export class Tile {
       .open(TileSelectorDialog)
       .afterClosed()
       .subscribe((tileId: string) => {
-        if (tileId) {
-          this.tableStore.pickupTile(this.playerId(), this.tile().id, tileId);
-        }
+        // if (tileId) {
+        //   this.tableStore.pickupTile(this.playerId(), this.tile().id, tileId);
+        // }
       });
   }
 
   onDiscard() {
-    this.tableStore.discardTile(this.playerId(), this.tile().id);
+    // this.tableStore.discardTile(this.playerId(), this.tile().id);
   }
 
   onToggleExpose() {
-    this.tableStore.toggleExposeTile(this.playerId(), this.tile().id);
+    // this.tableStore.toggleExposeTile(this.playerId(), this.tile().id);
   }
 }

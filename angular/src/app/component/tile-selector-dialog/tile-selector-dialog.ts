@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
-  inject,
-  ChangeDetectionStrategy,
+  inject
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -11,6 +10,7 @@ import { BonusTile, BonusTileType } from '../../model/bonus-tile';
 import { HonourTile, HonourTileType } from '../../model/honour-tile';
 import { SuitedTile, SuitedTileType } from '../../model/suited-tile';
 import { Tile } from '../../model/tile';
+import { TileSet } from '../../model/tile-set';
 import { TileType } from '../../model/tile-type';
 import { TileDisplayPipe } from '../../pipe/tile-display-pipe';
 import { TableStore } from '../../store/table-store';
@@ -24,7 +24,6 @@ interface TileCategory {
   selector: 'app-tile-chooser-dialog',
   imports: [CommonModule, MatButtonModule, MatDialogModule, TileDisplayPipe],
   templateUrl: './tile-selector-dialog.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile-selector-dialog.scss',
 })
 export class TileSelectorDialog {
@@ -102,7 +101,7 @@ export class TileSelectorDialog {
   private createTileMapByDisplay(
     predicate: (tile: Tile) => boolean,
   ): Map<string, Tile[]> {
-    const typedTiles = this.store.tiles().filter(predicate);
+    const typedTiles = TileSet.filter(predicate);
     const tileMap = new Map<string, Tile[]>();
 
     typedTiles.forEach((tile) => {

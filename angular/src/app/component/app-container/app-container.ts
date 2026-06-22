@@ -1,12 +1,10 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { OddsPanel } from '../odds-panel/odds-panel';
+import { Component } from '@angular/core';
 import { Table } from '../table/table';
 
 @Component({
   selector: 'app-app-container',
-  imports: [Table, OddsPanel],
+  imports: [Table],
   templateUrl: './app-container.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app-container.scss',
 })
 export class AppContainer {}

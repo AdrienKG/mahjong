@@ -1,41 +1,9 @@
-<div class="wind-label">{{ player().wind | windTypeDisplay }}</div>
+<div class="wind-label">{{ wind() }}</div>
 <div class="hand">
-  @for (group of groupedHand(); track $index) {
-    @if (group.isSelectedMeld) {
-      <div
-        class="meld-group"
-        [class.chi-group]="group.meldType === 'chi'"
-        [class.pung-group]="group.meldType === 'pung'"
-        [class.kong-group]="group.meldType === 'kong'"
-      >
-        @for (tile of group.tiles; track tile.id) {
-          <app-tile
-            [playerId]="playerSeat()"
-            [tile]="tile"
-            (mouseenter)="onTileHover(tile, $event)"
-            (mouseleave)="onTileHoverEnd()"
-            (tileClicked)="onTileClicked(tile)"
-          ></app-tile>
-        }
-        @if (group.canDismiss) {
-          <button
-            class="dismiss-meld-btn"
-            (click)="onMeldDismiss(group.meldId!)"
-          >
-            ×
-          </button>
-        }
-      </div>
-    } @else {
-      @for (tile of group.tiles; track tile.id) {
+      @for (tile of hand(); track tile.id) {
         <app-tile
-          [playerId]="playerSeat()"
+          [playerId]="wind()"
           [tile]="tile"
-          (mouseenter)="onTileHover(tile, $event)"
-          (mouseleave)="onTileHoverEnd()"
-          (tileClicked)="onTileClicked(tile)"
         ></app-tile>
-      }
-    }
   }
 </div>
